@@ -1,0 +1,159 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<!-- -------------------- Le formulaire de la recherche --------------------- -->
+<p-fieldset legend="Formulaire de recherche des logs d'activités : {{totalRecords ? totalRecords+' résultat(s)' : ''}}">
+    <form [formGroup]="FormmulaireRecherche" (ngSubmit)="RechercherLogs()">
+        <div class="row">
+            <div class="col">
+                <label>Entre le</label>
+                <input class="form-control" type="date" formControlName="debut">
+            </div>
+            <div class="col">
+                <label>Et le</label>
+                <input class="form-control" type="date" formControlName="fin">
+            </div>
+            <div class="col">
+                <label>Libellé</label>
+                <input class="form-control" type="text" formControlName="libelle_log" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Nom(s) de table(s)</label>
+                <p-multiSelect [options]="liste_tables" formControlName="table_name" scrollHeight="110px"
+                    [filter]="true" [virtualScrollItemSize]="38" placeholder="..." [resetFilterOnHide]="true"
+                    [filter]="generalService.innerWidth<992 ? false :true" [showClear]="true"
+                    selectedItemsLabel="{0} table(s)" [virtualScroll]="true" emptyFilterMessage="..." class="ng-dirty"
+                    emptyMessage="..." [maxSelectedLabels]="1">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge bg-beige">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-multiSelect>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>JSON</label>
+                <input class="form-control" type="text" formControlName="json_log_data" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Description</label>
+                <input class="form-control" type="text" formControlName="description" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Utilisateur</label>
+                <p-dropdown optionLabel="label" optionValue="value" [resetFilterOnHide]="true" [showClear]="true"
+                    [options]="liste_users" formControlName="id_user" [filter]="true" placeholder="..."
+                    emptyFilterMessage="Aucun utilisateur" emptyMessage="Aucun utilisateur" [virtualScroll]="true"
+                    [virtualScrollItemSize]="38">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-3">
+            <button class="btn btn-vert" type="button" [disabled]="liste_logs.length <= 0" (click)="exportToExcel()"
+                tooltipPosition="bottom" pTooltip="Cliquez ici pour exporter tous les logs">
+                <i class="fa fa-file-excel-o pr-2"></i> Exporter les logs
+            </button>
+            <div>
+                <i class="pi si pi-filter-slash addpadd mr-1" tooltipPosition="left" pTooltip="Vider le formulaire"
+                    (click)="ClearSearch()">
+                </i>
+                <button type="submit" class="btn btn-dark" [disabled]="is_loading" style="font-size: 11px !important;">
+                    <i class="fa fa-search mr-1"></i> Rechercher / Rafraîchir
+                </button>
+            </div>
+        </div>
+    </form>
+</p-fieldset>
+<!-- ------------------------- La liste des logs de l'application ------------------------- -->
+<p-table responsiveLayout="scroll" [value]="liste_logs" styleClass="p-datatable-responsive-demo" (onSort)="Sort($event)"
+    [sortOrder]="-1" (onPage)="paginate($event)" [paginator]="true" [rows]="take" [rowsPerPageOptions]="[10,20,100]"
+    [totalRecords]="totalRecords" [lazy]="true" [(first)]="skip" [showCurrentPageReport]="true" dataKey="_id"
+    currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats" [rowHover]="true"
+    sortField="created_at" rowExpandMode="single" paginatorPosition="both">
+    <!-- ---------------------------- Les colonnes ----------------------------- -->
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem"><i class="fa fa-list"></i></th>
+            <th pSortableColumn="nom_complet">Utilisateur<p-sortIcon field="nom_complet"></p-sortIcon></th>
+            <th pSortableColumn="table_name">Nom table<p-sortIcon field="table_name"></p-sortIcon></th>
+            <th pSortableColumn="libelle_log">Libellé de l'action<p-sortIcon field="libelle_log"></p-sortIcon></th>
+            <th pSortableColumn="created_at">Date de création<p-sortIcon field="created_at"></p-sortIcon></th>
+        </tr>
+    </ng-template>
+    <!-- -------------------------------- Body --------------------------------- -->
+    <ng-template pTemplate="body" let-log let-expanded="expanded">
+        <tr>
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="log"
+                    class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <td class="text-center">
+                <span style="font-weight: bold;">
+                    {{log?.nom_complet}}
+                </span>
+            </td>
+            <td class="text-center">
+                <span style="font-weight: bold;">
+                    {{log?.table_name ? log?.table_name : '...'}}
+                </span>
+            </td>
+            <td class="text-center">
+                <span style="font-weight: bold;">
+                    {{log?.libelle_log ? log?.libelle_log : '...'}}
+                </span>
+            </td>
+            <td class="text-center">
+                <span class="badge {{log?.created_at ? 'bg-success' : 'bg-jaune'}}">
+                    {{log?.created_at_formated ? log?.created_at_formated : '...'}}
+                </span>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ----------------------------- l'expension ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-log>
+        <tr>
+            <td [attr.colspan]='5'>
+                <p-fieldset legend="Description et détails de la transaction du {{log?.created_at_formated}} :">
+                    <pre style="font-size: 10px !important;" *ngIf="log?.description">
+                        {{ log?.description }}
+                    </pre>
+                    <span class="badge bg-jaune" *ngIf="!log?.description">
+                        Aucune description
+                    </span>
+                </p-fieldset>
+                <p-fieldset [styleClass]="'mt-2'"
+                    legend="Données sous format Json de la transaction du {{log?.created_at_formated}} :"
+                    *ngIf="log?.json_log_data">
+                    <pre style="font-size: 10px !important;" [innerHTML]="log?.json_log_data | prettyjson">
+                    </pre>
+                </p-fieldset>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="5">
+                <div class="text-center">
+                    <div class="center_media">
+                        <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                    </div>
+                    <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                    <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                        Chargement ...
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

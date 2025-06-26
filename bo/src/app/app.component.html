@@ -1,0 +1,9 @@
+<app-loader *ngIf="generalService.if_load"></app-loader>
+<router-outlet>
+    <div class="app_loader" *ngIf="generalService.if_load">
+        <div>
+            <img src="./assets/images/logo.svg" width="200px" alt="image loader">
+        </div>
+    </div>
+</router-outlet>
+<p-toast [preventOpenDuplicates]="true" [position]="generalService.innerWidth<992 ? 'bottom-center' : 'bottom-right'"></p-toast>

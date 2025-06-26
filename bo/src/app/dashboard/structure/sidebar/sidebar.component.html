@@ -1,0 +1,75 @@
+<aside class="sidebar shadow-sm" style="transition: 0.6s;">
+  <div class="sidebar-profile d-flex flex-column justify-content-center pt-3 pb-3">
+    <div class="mb-2 d-flex justify-content-center">
+      <!-- -------------------------- Image de profile --------------------------- -->
+      <div class="user-picture m-auto" *ngIf="image_user">
+        <img src="./assets/images/my-loader.svg" class="img-fluid" alt="image user"
+          *ngIf="is_loading && is_loading_image">
+        <img [src]="image_user" class="img-fluid" alt="image user" *ngIf="!is_loading || !is_loading_image"
+          onerror="this.src='assets/images/no_image.png'">
+      </div>
+      <div class="user-picture m-auto" *ngIf="!image_user" style="border-radius: unset !important;">
+        <img src="./assets/images/my-loader.svg" class="img-fluid" alt="image user"
+          *ngIf="is_loading && is_loading_image">
+        <img src="./assets/images/user.png" class="img-fluid" alt="image user" tooltipPosition="right"
+          *ngIf="!is_loading || !is_loading_image" pTooltip="{{user_data?.nom +' '+user_data?.prenom}}">
+      </div>
+    </div>
+    <div class="profile-details pb-2 text-center">
+      <p class="mb-0 text-uppercase name pl-2 pr-2">{{user_data?.nom}}</p>
+      <p class="mb-0 text-uppercase name pl-2 pr-2">{{user_data?.prenom}}</p>
+      <span class="user-status">
+        <i class="fa fa-circle"></i>
+        <span class="font-weight-bold">{{user_data?.libelle_role}}</span>
+        <i tooltipPosition="right" pTooltip="Son désactivé" style="font-size: 15px !important; margin-right: 10px !important;
+        color: #d01739 !important;" class="ml-2 fa fa-microphone-slash" aria-hidden="true" *ngIf="!if_has_sound"></i>
+      </span>
+    </div>
+  </div>
+  <div class="sidebar-search">
+    <div class="input-group">
+      <input type="text" class="form-control search-menu" [(ngModel)]="search_fliter" placeholder="Rechercher ..."
+        (keyup)="FilterSidebar()" (keypress)="GotoMenuSidebar($event)">
+      <div class="input-group-append">
+        <span class="input-group-text" style="border-radius: 0px !important; height: 32px !important;">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-menu pb-2">
+    <ul class="menu-items" class="text-center">
+      <li *ngFor="let menu of menu_sidebar">
+        <button class="btn mb-3 font-weight-bold" style="width: 90%;padding: 7px 0;white-space: break-spaces;"
+          id="{{menu?.routerLink}}" (click)="Gotomenu(menu)" [ngClass]="{'btn-warning' : generalService.currentMenu == menu?.routerLink,
+          'btn-blanc' : generalService.currentMenu != menu?.routerLink}"
+          pTooltip="Accéder au module : {{menu?.title}} ?" tooltipPosition="right">
+          <i class="{{menu?.icon}} mr-2" aria-hidden="true"></i>
+          <span style="font-size: 9px !important">{{menu?.title}}</span>
+        </button>
+      </li>
+      <li>
+        <i (click)="destroySession()" pTooltip="Fermer la session ?" tooltipPosition="right"
+          class="fa fa-power-off mr-2" style="color: #ff0000 !important;" aria-hidden="true"> </i>
+      </li>
+      <li *ngIf="generalService.innerWidth<992">
+        <img src="./assets/images/logo.svg" alt="logo of application" width="70">
+      </li>
+    </ul>
+    <div class="text-center mt-4 sidebar-search-no" *ngIf="menu_sidebar.length==0">
+      <div class="center_media">
+        <img src="./assets/images/no_data.png" width="80px" alt="image no_data">
+      </div>
+      <p class="font-weight-bold mt-2 font_12">
+        Aucun résultat
+      </p>
+    </div>
+  </nav>
+  <div class="navbar-header text-center p-2" tooltipPosition="top" style="cursor: pointer;"
+    (click)="Gotomenu({'routerLink': '/accueil'}, true)" pTooltip="Accueil">
+    <img src="./assets/images/logo.svg" alt="logo" width="150" *ngIf="generalService?.menu_toggel">
+    <!-- -------------------------------- mini --------------------------------- -->
+    <img src="./assets/images/logo.svg" style="padding-top: 5px;" alt="logo" width="150"
+      *ngIf="!generalService?.menu_toggel">
+  </div>
+</aside>

@@ -1,0 +1,170 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<form [formGroup]="FormmulairePartenaire" (ngSubmit)="SubmitForm()">
+    <p-accordion [activeIndex]="0" [multiple]="false">
+        <p-accordionTab header="Informations générales :">
+            <div class="d-flex justify-content-between center_media mt-2">
+                <div>
+                    <button type="button" class="btn btn-red" (click)="ClosePopUp()">
+                        Fermer
+                    </button>
+                </div>
+                <div>
+                    <img src="./assets/images/partenaire.svg" class='worker' alt="image partenaires">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-vert" [disabled]="Disabled || is_loading">
+                        {{Buttontext}}
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Libellé du partenaire : *</label>
+                    <span class="label_danger ml-1"
+                        *ngIf="IsFiled && FormmulairePartenaire.get('libelle_partenaire').errors">
+                        * ( Requis 3 caractères )
+                    </span>
+                    <input class="form-control" type="text" formControlName="libelle_partenaire" minlength="3"
+                        placeholder="...">
+                </div>
+                <div class="col">
+                    <label>Téléphone :</label>
+                    <input class="form-control" type="tel" formControlName="telephone_partenaire" pattern="[0-9\/]*"
+                        minlength="10" maxlength="15" placeholder="exp : 06xxxxxxxx">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Autorisation du partenaire :</label>
+                    <p-dropdown optionLabel="label" optionValue="value" appendTo="body" [resetFilterOnHide]="true"
+                        [showClear]="true" [options]="liste_autorisations" formControlName="autorisation_partenaire"
+                        [filter]="false" class="ng-dirty" placeholder="..." emptyFilterMessage="..."
+                        scrollHeight="110px">
+                        <ng-template let-element pTemplate="item">
+                            <div class="d-flex justify-content-between">
+                                <span class="font-11 badge {{element?.badge}}">{{element?.label}}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+                <div class="col">
+                    <label>Ville :</label>
+                    <p-dropdown optionLabel="label" optionValue="value" appendTo="body" [resetFilterOnHide]="true"
+                        [showClear]="true" [options]="liste_villes" formControlName="id_ville" [filter]="true"
+                        class="ng-dirty" placeholder="Choix de ville" emptyFilterMessage="Aucune ville"
+                        [virtualScroll]="true" [virtualScrollItemSize]="38" scrollHeight="110px">
+                        <ng-template let-element pTemplate="item">
+                            <div class="d-flex justify-content-between">
+                                <span class="font-11 badge bg-beige">{{element?.label}}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Description (facultative) :</label>
+                    <textarea class="form-control" formControlName="description" rows="3"
+                        placeholder="Vous pouvez spécifier plus de détails au niveau de ce champ"></textarea>
+                </div>
+            </div>
+        </p-accordionTab>
+        <p-accordionTab header="Informations complémentaires :">
+            <div class="d-flex justify-content-center center_media mb-2">
+                <div>
+                    <img src="./assets/images/info_partenaire.svg" class='worker' alt="image informations">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Type du partenaire :</label>
+                    <p-dropdown optionLabel="label" optionValue="value" appendTo="body" [resetFilterOnHide]="true"
+                        [showClear]="true" [options]="liste_type_societe" formControlName="type_societe_partenaire"
+                        [filter]="false" class="ng-dirty" placeholder="..." emptyFilterMessage="..."
+                        scrollHeight="110px">
+                        <ng-template let-element pTemplate="item">
+                            <div class="d-flex justify-content-between">
+                                <span class="font-11 badge bg-beige">{{element?.label}}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+                <div class="col">
+                    <label>RIB :</label>
+                    <input class="form-control" type="text" formControlName="rib_partenaire" placeholder="..." />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>I.C.E :</label>
+                    <input class="form-control" type="text" placeholder="..." formControlName="ice_partenaire"
+                        maxlength="15" minlength="15">
+                </div>
+                <div class="col">
+                    <label>Email :</label>
+                    <input class="form-control" type="email" formControlName="email_partenaire" minlength="10"
+                        maxlength="100" placeholder="...">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Adresse :</label>
+                    <textarea class="form-control" formControlName="adresse_partenaire" rows="3"
+                        placeholder="Vous pouvez spécifier l'adresse du partenaire"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Registre commerce (RC) :</label>
+                    <input class="form-control" type="text" formControlName="registre_commerce_partenaire"
+                        placeholder="..." />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Identifiant fiscale (IF) :</label>
+                    <input class="form-control" type="text" formControlName="identifiant_fiscal_partenaire"
+                        placeholder="...">
+                </div>
+                <div class="col">
+                    <label>Fax :</label>
+                    <input class="form-control" type="tel" formControlName="fax_partenaire">
+                </div>
+            </div>
+        </p-accordionTab>
+        <p-accordionTab header="Les informations du responsable :">
+            <div class="d-flex justify-content-center center_media mb-2">
+                <div>
+                    <img src="./assets/images/partenaire_info_resp.svg" class='worker' alt="image responsable">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Nom complet du responsable :</label>
+                    <input class="form-control" type="text" formControlName="responsable_nom_complet"
+                        placeholder="Vous pouvez saisir le nom complet du responsable">
+                </div>
+                <div class="col">
+                    <label>Téléphone du responsable :</label>
+                    <input class="form-control" type="tel" formControlName="responsable_telephone" pattern="[0-9\/]*"
+                        placeholder="exp : 05xxxxxxxx">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Email du responsable :</label>
+                    <input class="form-control" type="email" formControlName="responsable_email"
+                        placeholder="Vous pouvez saisir l'adresse email">
+                </div>
+            </div>
+        </p-accordionTab>
+    </p-accordion>
+    <div class="d-flex justify-content-between center_media mt-2">
+        <button type="button" class="btn btn-red" (click)="ClosePopUp()">
+            Fermer
+        </button>
+        <button type="submit" class="btn btn-vert" [disabled]="Disabled || is_loading">
+            {{Buttontext}}
+        </button>
+    </div>
+</form>

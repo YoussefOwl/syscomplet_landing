@@ -1,0 +1,240 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<!-- -------------------- Le formulaire de la recherche --------------------- -->
+<p-fieldset legend="Formulaire de recherche de contenu : {{totalRecords ? totalRecords+' résultat(s)' : ''}}"
+    [toggleable]="false">
+    <form [formGroup]="FormmulaireRecherche" (ngSubmit)="RechercherContenu()">
+        <div class="row">
+            <div class="col">
+                <label>Identifiant (HTML)</label>
+                <input class="form-control" type="text" formControlName="html_id" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Description (FR)</label>
+                <input class="form-control" type="text" formControlName="description_fr" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Description (AR)</label>
+                <input class="form-control" type="text" formControlName="description_ar" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Page : *</label>
+                <p-dropdown [filter]="true" optionLabel="label" optionValue="value" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_pages" formControlName="page" placeholder="..."
+                    emptyFilterMessage="Aucune page" liste_pages="110px" class="ng-dirty">
+                    <ng-template let-element pTemplate="item">
+                        <span class="font-11">{{element?.label}}</span>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="col">
+                <label>Position : *</label>
+                <p-dropdown [filter]="true" optionLabel="label" optionValue="value" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_page_positions" formControlName="page_position"
+                    placeholder="..." emptyFilterMessage="Aucune position" scrollHeight="110px" class="ng-dirty">
+                    <ng-template let-element pTemplate="item">
+                        <span class="font-11">{{element?.label}}</span>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button class="btn btn-warning mr-2" type="button" (click)="ShowFormulaire()" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour ajouter un nouveau contenu">
+                    <i class="fa fa-plus-circle mr-1"></i> Ajouter un contenu
+                </button>
+                <button class="btn btn-vert" type="button" [disabled]="liste_contenus?.length <= 0"
+                    (click)="export('excel')" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour exporter tous les contenus sous format excel">
+                    <i class="fa fa-file-excel-o mr-1"></i> Exporter en excel
+                </button>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-dark" [disabled]="is_loading" style="font-size: 11px !important;">
+                    <i class="fa fa-search mr-1"></i> Rechercher / Rafraîchir
+                </button>
+                <i class="ml-2 pi si pi-filter-slash addpadd mr-1" tooltipPosition="left"
+                    pTooltip="Cliquez ici pour vider le formulaire" (click)="ClearSearch()">
+                </i>
+            </div>
+        </div>
+    </form>
+</p-fieldset>
+<!-- ------------------------- La liste des contenus ------------------------- -->
+<p-table responsiveLayout="scroll" [value]="liste_contenus"
+    styleClass="p-datatable-responsive-demo p-datatable-gridlines" (onSort)="Sort($event)" (onPage)="paginate($event)"
+    [paginator]="true" [rows]="take" [rowsPerPageOptions]="[10,20,100]" [totalRecords]="totalRecords" [lazy]="true"
+    [(first)]="skip" [showCurrentPageReport]="true" dataKey="_id" [sortOrder]="1"
+    currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats" [rowHover]="true"
+    sortField="html_id" paginatorPosition="both" rowExpandMode="single">
+    <!-- ---------------------------- Les colonnes ----------------------------- -->
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem"><i class="fa fa-list"></i></th>
+            <th pSortableColumn="html_id">Identifiant (HTML)<p-sortIcon field="html_id">
+                </p-sortIcon>
+            </th>
+            <th pSortableColumn="page">Page<p-sortIcon field="page">
+                </p-sortIcon>
+            </th>
+            <th pSortableColumn="page_position">Position<p-sortIcon field="page_position">
+                </p-sortIcon>
+            </th>
+            <th style="width: 800px;" pSortableColumn="description_fr">Description (FR)<p-sortIcon
+                    field="description_fr">
+                </p-sortIcon>
+            </th>
+            <th>Actions</th>
+        </tr>
+    </ng-template>
+    <!-- -------------------------------- Body --------------------------------- -->
+    <ng-template pTemplate="body" let-contenu let-expanded="expanded">
+        <tr [style]="'background-color:'+(expanded ? ' rgb(223, 223, 223);': '')">
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="contenu"
+                    class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <td class="text-center">
+                <span class="font-weight-bold">
+                    # {{contenu?.html_id}}
+                </span>
+            </td>
+            <td class="text-center">
+                {{contenu?.page_label ?? '...'}}
+            </td>
+            <td class="text-center">
+                {{contenu?.page_position_label ?? '...'}}
+            </td>
+            <td>
+                <div [innerHTML]="contenu?.description_fr" *ngIf="contenu?.description_fr"
+                    style="max-height: 250px; overflow-y: auto;">
+                </div>
+                <span *ngIf="!contenu?.description_fr">
+                    ...
+                </span>
+            </td>
+            <td class="text-center">
+                <i class="pi si pi-pencil addpadd" tooltipPosition="left"
+                    pTooltip="Modifier les informations du contenu : {{contenu?.html_id}} ?"
+                    (click)="ShowFormulaire(contenu)">
+                </i>
+                <i class="pi si pi-image addpadd" tooltipPosition="left"
+                    pTooltip="Gérer l'image de : {{contenu?.html_id}} ?" (click)="ShowImage(contenu)">
+                </i>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ----------------------------- l'expension ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-contenu>
+        <tr style="background:rgb(223, 223, 223);">
+            <td [attr.colspan]='6'>
+                <div class="row p-3">
+                    <div class="col">
+                        <ul style="font-size: 12px;">
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Date d'ajout sur le système :
+                                </span>
+                                <span>
+                                    {{
+                                    contenu?.created_at_formated
+                                    ? contenu?.created_at_formated
+                                    : '...'
+                                    }}
+                                </span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Class :
+                                </span>
+                                <span>
+                                    {{
+                                    contenu?.class
+                                    ? contenu?.class
+                                    : '...'
+                                    }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <ul style="font-size: 12px;">
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Dernière date de modification :
+                                </span>
+                                <span>
+                                    {{
+                                    contenu?.updated_at_formated
+                                    ? contenu?.updated_at_formated
+                                    : '...'
+                                    }}
+                                </span>
+                            </li>
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Autre :
+                                </span>
+                                <span>
+                                    {{
+                                    contenu?.autre
+                                    ? contenu?.autre
+                                    : '...'
+                                    }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <p-accordion [activeIndex]="0" [multiple]="false">
+                    <p-accordionTab header="Description (AR) du contenu : {{contenu?.html_id }}">
+                        <div [innerHTML]="contenu?.description_ar" *ngIf="contenu?.description_ar">
+                        </div>
+                        <span *ngIf="!contenu?.description_ar">
+                            ...
+                        </span>
+                    </p-accordionTab>
+                </p-accordion>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="6">
+                <div class="text-center">
+                    <div class="center_media">
+                        <img src="./assets/images/no_data.png" width="80px" alt="image no_data">
+                    </div>
+                    <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                    <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                        Chargement ...
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<!-- ----------------------------------------------------------------------- -->
+<!--                      Le formulaire de modification                      -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{Header_info}}" [(visible)]="if_show_crud" [resizable]="false"
+    (onHide)="data_contenu = null" [style]="{'min-width': '100vw','min-height': '100vh'}" [maximizable]="false"
+    [modal]="true" [baseZIndex]="10000">
+    <app-formulaire-update-add-contenu [data_contenu]="data_contenu" *ngIf="if_show_crud" (FermerPopUp)="Close()">
+    </app-formulaire-update-add-contenu>
+</p-dialog>
+<!-- ----------------------------------------------------------------------- -->
+<!--                                  image                                  -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{Header_info}}" [(visible)]="if_show_image" [resizable]="false"
+    (onHide)="data_contenu = null" [style]="{'min-width': '50vw'}" [maximizable]="false"
+    [modal]="true" [baseZIndex]="10000">
+    <app-upload-image [dataItem]="data_contenu" *ngIf="if_show_image" (FermerPopUp)="Close()">
+    </app-upload-image>
+</p-dialog>

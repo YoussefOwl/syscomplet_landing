@@ -1,0 +1,91 @@
+<!-- ------------------------------ le header ------------------------------ -->
+<p-breadcrumb [model]="items" [home]="{icon: 'pi pi-home',routerLink:'/accueil'}" (onItemClick)="onItemClick($event)">
+</p-breadcrumb>
+<app-loader *ngIf="is_loading"></app-loader>
+<p-fieldset legend="Activité récente :" [toggleable]="false">
+    <p-table responsiveLayout="scroll" [value]="liste_logs" styleClass="p-datatable-responsive-demo"
+        (onSort)="Sort($event)" [sortOrder]="-1" (onPage)="paginate($event)" [paginator]="true" [rows]="take"
+        [rowsPerPageOptions]="[10,20,100]" [totalRecords]="totalRecords" [lazy]="true" [(first)]="skip"
+        [showCurrentPageReport]="true" dataKey="_id" [rowHover]="true"
+        currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats"
+        sortField="created_at" rowExpandMode="single" paginatorPosition="both">
+        <!-- ---------------------------- Les colonnes ----------------------------- -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem"><i class="fa fa-list"></i></th>
+                <th pSortableColumn="nom_complet">Utilisateur<p-sortIcon field="nom_complet"></p-sortIcon></th>
+                <th pSortableColumn="created_at">Date de création<p-sortIcon field="created_at"></p-sortIcon></th>
+                <th pSortableColumn="table_name">Nom du module<p-sortIcon field="table_name"></p-sortIcon></th>
+                <th pSortableColumn="libelle_log">Libellé d'action<p-sortIcon field="libelle_log"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+        <!-- -------------------------------- Body --------------------------------- -->
+        <ng-template pTemplate="body" let-log let-expanded="expanded">
+            <tr>
+                <td>
+                    <button type="button" pButton pRipple [pRowToggler]="log"
+                        class="p-button-text p-button-rounded p-button-plain"
+                        [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                        [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                    </button>
+                </td>
+                <td class="text-center">
+                    <span style="font-weight: bold;">
+                        {{log?.nom_complet}}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span *ngIf="!log?.created_at_formated">
+                        ...
+                    </span>
+                    <span class="badge bg-bleu" *ngIf="log?.created_at_formated" style="letter-spacing: 2px;">
+                        {{log?.created_at_formated}}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span style="font-weight: bold; text-transform: capitalize;">
+                        {{log?.table_name ? log?.table_name : '...'}}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span style="font-weight: bold;">
+                        {{log?.libelle_log ? log?.libelle_log : '...'}}
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+        <!-- ----------------------------- l'expension ----------------------------- -->
+        <ng-template pTemplate="rowexpansion" let-log>
+            <tr>
+                <td [attr.colspan]='5'>
+                    <p-fieldset legend="Description et détails de la transaction du {{log?.created_at_formated}} :">
+                        <span style="font-size: 12px !important; font-weight: bolc;" *ngIf="log?.description">
+                            {{ log?.description }}
+                        </span>
+                        <span class="badge bg-jaune" *ngIf="!log?.description">
+                            Aucune description
+                        </span>
+                    </p-fieldset>
+                </td>
+            </tr>
+        </ng-template>
+        <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="5">
+                    <div class="text-center">
+                        <div class="center_media">
+                            <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                        </div>
+                        <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                            Aucun enregistrement sur la base de données
+                        </p>
+                        <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                            Chargement ...
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-fieldset>

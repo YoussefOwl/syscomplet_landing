@@ -1,0 +1,1 @@
+Ici les composants et modules partagée entre les différents rôles de l'application

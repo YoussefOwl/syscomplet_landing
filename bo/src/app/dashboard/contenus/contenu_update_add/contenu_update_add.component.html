@@ -1,0 +1,96 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<form [formGroup]="FormmulaireContenu" (ngSubmit)="SubmitForm()">
+    <p-fieldset legend="Informations générales : # {{data_contenu?.html_id}}" [toggleable]="false">
+        <div class="d-flex justify-content-center center_media mb-2">
+            <div>
+                <img src="./assets/images/contenu.png" width="120px" alt="image contenu">
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mb-2">
+            <div>
+                <button type="button" class="btn btn-red" (click)="ClosePopUp()">
+                    Fermer
+                </button>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-vert" [disabled]="is_loading">
+                    {{Buttontext}}
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Identifiant html : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireContenu.get('html_id').errors">
+                    * ( Requis 1 caractères min.)
+                </span>
+                <input class="form-control" type="text" formControlName="html_id" minlength="1" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Page : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireContenu.get('page').errors">
+                    * Requis
+                </span>
+                <p-dropdown [filter]="true" optionLabel="label" optionValue="value" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_pages" formControlName="page" placeholder="..."
+                    emptyFilterMessage="Aucune page" liste_pages="110px" class="ng-dirty">
+                    <ng-template let-element pTemplate="item">
+                        <span class="font-11">{{element?.label}}</span>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="col">
+                <label>Position : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireContenu.get('page_position').errors">
+                    * Requis
+                </span>
+                <p-dropdown [filter]="true" optionLabel="label" optionValue="value" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_page_positions" formControlName="page_position" placeholder="..."
+                    emptyFilterMessage="Aucune position" scrollHeight="110px" class="ng-dirty">
+                    <ng-template let-element pTemplate="item">
+                        <span class="font-11">{{element?.label}}</span>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="col">
+                <label>Class : (Optionnel)</label>
+                <input class="form-control" type="text" formControlName="class" minlength="1" placeholder="...">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Description (FR) : <span style="color: blue; font-size: 10px;">(min 10 caractères)</span>
+                    *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireContenu.get('description_fr').errors">
+                    ( Invalide )
+                </span>
+                <ckeditor [editor]="Editor" [config]="config" formControlName="description_fr"></ckeditor>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Description (AR) :</label>
+                <ckeditor [config]="config" [editor]="Editor" formControlName="description_ar"></ckeditor>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Autre : (Optionnel)</label>
+                <textarea class="form-control" type="text" formControlName="autre" rows="4" minlength="1" placeholder="lien - html">
+                </textarea>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button type="button" class="btn btn-red" (click)="ClosePopUp()">
+                    Fermer
+                </button>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-vert" [disabled]="is_loading">
+                    {{Buttontext}}
+                </button>
+            </div>
+        </div>
+    </p-fieldset>
+</form>

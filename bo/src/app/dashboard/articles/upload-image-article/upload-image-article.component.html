@@ -1,0 +1,30 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<p-card>
+    <div class="d-flex justify-content-between">
+        <div class="style_header my-2">
+            <h1>
+                <span>Image :</span>
+            </h1>
+        </div>
+        <div class="text-center">
+            <p-fileUpload 
+                *ngIf="!is_loading"
+                mode="basic" 
+                chooseLabel="Ajouter" 
+                chooseIcon="pi pi-upload"
+                [accept]="accept_format" 
+                [maxFileSize]="max_val_accepted" 
+                (onSelect)="handleFileUpload($event)"/>
+            <i *ngIf="is_loading" class="pi pi-spinner pi-spin"></i>
+        </div>
+    </div>
+    <div class="mt-3 flex flex-column align-items-center text-center">
+        <!-- -------------------------------- image -------------------------------- -->
+        <p-image *ngIf="dataItem?.image_article" appendTo="body"
+            [src]="dataItem?.image_article"
+            alt="Fichier : {{dataItem?.image_article}}"
+            imageClass="taille_120 fit_contain" [preview]="true">
+        </p-image>
+        <p *ngIf="!dataItem?.image_article">Aucune image sélectionnée</p>
+    </div>
+</p-card>

@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "mix",
+    "watch": "mix watch",
+    "prod": "mix --production"
+  },
+  "dependencies": {
+    "animate.css": "^4.1.1",
+    "axios": "^1.10.0",
+    "scrollreveal": "^4.0.9"
+  },
+  "devDependencies": {
+    "laravel-mix": "^6.0.49"
+  }
+}

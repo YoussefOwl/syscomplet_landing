@@ -1,0 +1,19 @@
+<!-- ------------------------------ le header ------------------------------ -->
+<p-breadcrumb [model]="items" [home]="{icon: 'pi pi-home',routerLink:'/accueil'}" (onItemClick)="onItemClick($event)">
+</p-breadcrumb>
+<p-tabView [activeIndex]="lasttab_selected_compte" (onChange)="indexer($event)">
+    <p-tabPanel tooltipPosition="bottom" header="Mes informations" leftIcon="pi pi-user"
+        tooltip="Cliquez ici pour modifier vos informations">
+        <app-informations [id_user]="id_user" [source]="'utilisateur'" *ngIf="lasttab_selected_compte==0">
+        </app-informations>
+    </p-tabPanel>
+    <p-tabPanel tooltipPosition="bottom" header="Photo de profile" leftIcon="pi pi-image"
+        tooltip="Cliquez ici pour modifier votre photo de profile">
+        <app-image-profile [id_user]="id_user" [image]="image" [source]="'utilisateur'"
+            *ngIf="lasttab_selected_compte==1"></app-image-profile>
+    </p-tabPanel>
+    <p-tabPanel tooltipPosition="bottom" header="Gestion du mot de passe" leftIcon="pi pi-sign-in"
+        tooltip="Cliquez ici pour changer votre mot de passe">
+        <app-password *ngIf="lasttab_selected_compte==2" [id_user]="id_user"></app-password>
+    </p-tabPanel>
+</p-tabView>

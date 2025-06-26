@@ -1,0 +1,116 @@
+@import "./partials/variables";
+@import "./partials/navbar";
+@import "./partials/sidebar";
+@import "./partials/themes";
+.icon-style {
+  width: 35px;
+  height: 35px;
+  text-align: center;
+  line-height: 35px;
+  font-size: 18px;
+}
+body {
+  height: 100vh;
+  margin: 0;
+}
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  height: 100vh !important;
+  .layout-sidebar {
+    flex: 1 1 100%;
+    max-width: 13%;
+    transition: 0.3s;
+  }
+  .layout-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+    max-width: 95%;
+  }
+  main {
+    display: flex;
+    height: 100%;
+    .overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      opacity: 0.7;
+      display: none;
+      &.show {
+        display: block;
+        @media (min-width: 1025px) {
+          display: none;
+        }
+      }
+    }
+  }
+  &.toggeled-sidebar {
+    main {
+      .overlay {
+        display: block;
+        @media (min-width: 1025px) {
+          display: none;
+        }
+      }
+    }
+  }
+}
+.toast {
+  opacity: 1;
+}
+.cm-dialog .p-dialog {
+  min-width: 60%;
+  max-width: 60%;
+}
+@media screen and (max-width: 1024px) {
+  .layout-main {
+    max-width: 100% !important;
+    width: 100%;
+  }
+  .layout-sidebar {
+    height: 100%;
+    position: absolute !important;
+    transition: left 0.3s ease;
+    left: -220px;
+    top: 0;
+    width: 100%;
+    z-index: 111111111111;
+    background: #f4f7fc;
+  }
+  .toggeled-sidebar {
+    .layout-sidebar {
+      left: 0 !important;
+      max-width: 70%;
+    }
+    .overlay {
+      display: block;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100;
+      opacity: 0.7;
+      width: 30%;
+      background-color: #000;
+      z-index: -1;
+      transition: 0.3s;
+    }
+  }
+  .icon-style {
+    font-size: 12px;
+  }
+  .cm-dialog .p-dialog {
+    min-width: 99%;
+    max-width: 99%;
+  }
+}
+@media screen and (min-width: 760px) and (max-width: 1024px) {
+  .cm-dialog .p-dialog {
+    min-width: 60%;
+    max-width: 80%;
+  }
+}

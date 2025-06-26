@@ -1,0 +1,195 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<form [formGroup]="FormulaireRecherche" (ngSubmit)="Rechercher()">
+    <!-- -------------------- Le formulaire de la recherche --------------------- -->
+    <p-fieldset [toggleable]="false" legend="Formulaire de recherche : {{totalRecords ? totalRecords+' résultat(s)' : ''}}">
+        <div class="row">
+            <div class="col">
+                <label>Libellé fournisseur</label>
+                <input type="text" class="form-control" formControlName="libelle_fournisseur" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Description</label>
+                <input type="text" class="form-control" formControlName="description" placeholder="...">
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button class="btn btn-aqua" type="button" (click)="ShowFormulaireAjout()" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour ajouter un nouveau fournisseur">
+                    <i class="fa fa-plus-circle mr-1"></i> Ajouter
+                </button>
+            </div>
+            <div>
+                <i class="pi si pi-filter-slash pad" tooltipPosition="left"
+                    pTooltip="Vider le formulaire de recherche ?" (click)="ClearSearch()">
+                </i>
+                <button type="submit" class="btn btn-dark" [disabled]="is_loading" tooltipPosition="bottom"
+                    pTooltip="Veuillez cliquer ici pour rechercher ou actualiser la liste des fournisseur">
+                    <span *ngIf="is_loading">
+                        <i class="pi pi-spin pi-spinner mr-1"></i> Chargement...
+                    </span>
+                    <span *ngIf="!is_loading">
+                        <i class="fa fa-recycle mr-1"></i> Actualiser / Rechercher
+                    </span>
+                </button>
+            </div>
+        </div>
+    </p-fieldset>
+</form>
+<!-- ----------------------------------------------------------------------- -->
+<!--                                  table                                  -->
+<!-- ----------------------------------------------------------------------- -->
+<p-table responsiveLayout="scroll" [value]="liste_fournisseurs" rowExpandMode="single"
+    styleClass="p-datatable-responsive-demo p-datatable-gridlines" (onSort)="Sort($event)"
+    (onPage)="paginate($event)" [paginator]="true" [rows]="take" [rowsPerPageOptions]="[10,20,50,100]"
+    [totalRecords]="totalRecords" [lazy]="true" [(first)]="skip" [showCurrentPageReport]="true" dataKey="id"
+    [sortOrder]="-1" sortField="libelle_fournisseur" paginatorPosition="both" paginatorDropdownAppendTo="body"
+    currentPageReportTemplate="Affichage {first} à {last} de {totalRecords} résultats">
+    <!-- ------------------------------- header -------------------------------- -->
+    <ng-template pTemplate="header">
+        <tr>
+            <th *ngFor="let col of headerProps" [pSortableColumn]="col?.sort ? col?.key: false"
+                [style]="col?.style">
+                <i class="pi pi-align-justify" *ngIf="col?.burgerMenu"></i>
+                {{col?.label}}
+                <p-sortIcon *ngIf="col?.sort && col?.key" [field]="col?.key"></p-sortIcon>
+            </th>
+        </tr>
+    </ng-template>
+    <!-- ------------------------------- body --------------------------------- -->
+    <ng-template pTemplate="body" let-dataItem let-expanded="expanded">
+        <tr [style]="'background-color:'+(expanded ? ' rgb(223, 223, 223);': '')">
+            <td class="text-center">
+                <button type="button" pButton pRipple [pRowToggler]="dataItem"
+                    class="p-button-text p-button-rounded p-button-plain expand_button"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <!-- -------------------------------- image -------------------------------- -->
+            <td class="text-center">
+                <p-image [src]="dataItem?.image_fournisseur"
+                    *ngIf="dataItem?.image_fournisseur" alt="Image article"
+                    imageClass="taille_80 fit_contain" [preview]="true" appendTo="body">
+                </p-image>
+                <img src="assets/images/no_image.png" class="taille_80"
+                    *ngIf="!dataItem?.image_fournisseur">
+            </td>
+            <!-- ------------------------- libelle_fournisseur ------------------------- -->
+            <td class="text-center">
+                <b>{{dataItem?.libelle_fournisseur}}</b>
+            </td>
+            <!-- ------------------------------- description --------------------------- -->
+            <td class="text-center">
+                <b>{{dataItem?.description ?? '...'}}</b>
+            </td>
+            <!-- ------------------------------- actions ------------------------------- -->
+            <td class="text-center">
+                <i class="pi si pi-pencil pad" tooltipPosition="left"
+                    pTooltip="Modifier les informations du fournisseur : {{dataItem?.image_fournisseur}} ?"
+                    (click)="ShowFormulaireUpdate(dataItem)">
+                </i>
+                <i class="pi si pi-image pad" tooltipPosition="left"
+                    pTooltip="Gérer l'image de : {{dataItem?.libelle_fournisseur}} ?" (click)="ShowImage(dataItem)">
+                </i>
+                <i class="pi si pi-trash pad"
+                    pTooltip="Supprimer la commande : {{dataItem?.libelle_fournisseur}} ?" tooltipPosition="left"
+                    (click)="onDelete(dataItem)">
+                </i>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ---------------------------- rowexpansion ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-dataItem>
+        <tr style="background:rgb(223, 223, 223);">
+            <td [attr.colspan]='headerProps?.length'>
+                <p-fieldset legend="Plus d'informations : ">
+                    <div class="row">
+                        <div class="col">
+                            <ul style="font-size: 11px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Date d'ajout sur le système :
+                                    </span>
+                                    <span>
+                                        {{dataItem?.created_at_formated}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul style="font-size: 11px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Dernière date de modification :
+                                    </span>
+                                    <span>
+                                        {{dataItem?.updated_at_formated? dataItem?.updated_at_formated : '...'}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </p-fieldset>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr *ngFor="let i of (is_loading ? (take | get_col_range) : [])">
+            <td *ngFor="let j of headerProps?.length | get_col_range">
+                <p-skeleton height="3rem"></p-skeleton>
+            </td>
+        </tr>
+        <tr *ngIf="!is_loading">
+            <td [attr.colspan]="headerProps?.length">
+                <div class="text-center">
+                    <div class="text-center">
+                        <img src="./assets/images/no_data.png" width="100px" alt="image no_data">
+                    </div>
+                    <p class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<!-- ----------------------------------------------------------------------- -->
+<!--                                 ajouter                                 -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{Header_info}}" [(visible)]="if_show_ajouter" [resizable]="false"
+    (onHide)="CloseFormulaire()" [style]="{'min-width': '50vw'}" [maximizable]="false"
+    [modal]="true" [baseZIndex]="10000">
+    <p-card *ngIf="if_show_ajouter">
+        <div class="style_header my-2">
+            <h1>
+                <span>Ajouter un nouveau fournisseur :</span>
+            </h1>
+        </div>
+        <app-ajout-fournisseur (FermerPopUp)="CloseFormulaire()"></app-ajout-fournisseur>
+    </p-card>
+</p-dialog>
+<!-- ----------------------------------------------------------------------- -->
+<!--                                 upload                                  -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{Header_info}}" [(visible)]="if_show_update" [resizable]="false"
+(onHide)="CloseFormulaire()" [style]="{'min-width': '50vw'}" [maximizable]="false"
+[modal]="true" [baseZIndex]="10000">
+<p-card *ngIf="if_show_update">
+    <div class="style_header my-2">
+        <h1>
+            <span>Formulaire de modification :</span>
+        </h1>
+    </div>
+    <app-update-fournisseur [dataItem]="dataItem"  (FermerPopUp)="CloseFormulaire()"></app-update-fournisseur>
+</p-card>
+<!-- ----------------------------------------------------------------------- -->
+<!--                                  image                                  -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{Header_info}}" [(visible)]="if_show_image" [resizable]="false"
+    (onHide)="dataItem = null" [style]="{'min-width': '50vw'}" [maximizable]="false"
+    [modal]="true" [baseZIndex]="10000">
+    <app-upload-image [dataItem]="dataItem" *ngIf="if_show_image" (FermerPopUp)="CloseFormulaire()">
+    </app-upload-image>
+</p-dialog>

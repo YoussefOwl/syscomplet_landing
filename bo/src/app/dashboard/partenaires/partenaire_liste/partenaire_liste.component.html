@@ -1,0 +1,364 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<!-- -------------------- Le formulaire de la recherche --------------------- -->
+<p-fieldset legend="Formulaire de recherche des partenaires : {{totalRecords>0 ? totalRecords+' résultat(s)' : ''}}"
+    [toggleable]="false">
+    <form [formGroup]="FormmulaireRecherche" (ngSubmit)="RechercherPartenaire()">
+        <div class="row">
+            <div class="col">
+                <label>Libellé</label>
+                <input class="form-control" type="text" formControlName="libelle_partenaire"
+                    placeholder="Vous pouvez saisir un libellé">
+            </div>
+            <div class="col">
+                <label>I.C.E</label>
+                <input class="form-control" type="text" formControlName="ice_partenaire"
+                    placeholder="Vous pouvez saisir l'identifiant commun de l'entreprise">
+            </div>
+            <div class="col">
+                <label>Email</label>
+                <input class="form-control" type="email" formControlName="email_partenaire"
+                    placeholder="Vous pouvez saisir l'email">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Autorisation du partenaire</label>
+                <p-dropdown optionLabel="label" optionValue="value" [resetFilterOnHide]="true" [showClear]="true"
+                    [options]="liste_autorisations" formControlName="autorisation_partenaire" [filter]="true"
+                    placeholder="..." emptyFilterMessage="..." scrollHeight="110px">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge {{element?.badge}}">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="col">
+                <label>Ville</label>
+                <p-dropdown optionLabel="label" optionValue="value" [resetFilterOnHide]="true" [showClear]="true"
+                    [options]="liste_villes" formControlName="id_ville" [filter]="true" scrollHeight="110px"
+                    placeholder="Choix de ville" emptyFilterMessage="Aucune ville" [virtualScroll]="true"
+                    [virtualScrollItemSize]="38">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge bg-beige">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button class="btn btn-warning mr-2" type="button" (click)="ShowFormulaire('ajouter')"
+                    tooltipPosition="bottom" pTooltip="Cliquez ici pour ajouter un nouveau partenaire">
+                    <i class="fa fa-plus-circle mr-1"></i> Ajouter un partenaire
+                </button>
+                <button class="btn btn-vert" type="button" [disabled]="ListePartenaire?.length <= 0"
+                    (click)="exportToExcel()" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour exporter tous les partenaires">
+                    <i class="fa fa-file-excel-o pr-2"></i> Exporter en excel
+                </button>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-dark mr-2" style="font-size: 11px !important;"
+                    [disabled]="is_loading">
+                    <i class="fa fa-search mr-1"></i> Rechercher / Rafraîchir
+                </button>
+                <i class="pi si pi-filter-slash addpadd" tooltipPosition="left" pTooltip="Vider le formulaire ?"
+                    (click)="ClearSearch()">
+                </i>
+            </div>
+        </div>
+    </form>
+</p-fieldset>
+<!-- ------------------------- La liste des partenaires ------------------------- -->
+<p-table responsiveLayout="scroll" [value]="ListePartenaire"
+    styleClass="p-datatable-responsive-demo p-datatable-gridlines" (onSort)="Sort($event)" (onPage)="paginate($event)"
+    [paginator]="true" [rows]="take" [rowsPerPageOptions]="[10,20,50]" [totalRecords]="totalRecords" [lazy]="true"
+    [(first)]="skip" [showCurrentPageReport]="true" dataKey="_id" [sortOrder]="1"
+    currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats" [rowHover]="true"
+    sortField="libelle_partenaire" paginatorPosition="both">
+    <!-- ---------------------------- Les colonnes ----------------------------- -->
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem"><i class="fa fa-list"></i></th>
+            <th><i class="fa fa-image"></i> Logo du partenaire</th>
+            <th pSortableColumn="libelle_partenaire">Libellé<p-sortIcon field="libelle_partenaire"></p-sortIcon>
+            </th>
+            <th pSortableColumn="libelle_ville">Ville<p-sortIcon field="libelle_ville"></p-sortIcon>
+            </th>
+            <th pSortableColumn="autorisation_partenaire">Autorisation<p-sortIcon
+                    field="autorisation_partenaire"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+        </tr>
+    </ng-template>
+    <!-- -------------------------------- Body --------------------------------- -->
+    <ng-template pTemplate="body" let-partenaire let-expanded="expanded">
+        <tr>
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="partenaire"
+                    class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <td>
+                <div class="d-flex flex-column center_media" style="align-items: center;">
+                    <img [src]="API_BASE_URL_STORAGE_PARTENAIRES+partenaire?.logo_partenaire"
+                        style="cursor: pointer; object-fit: contain;" onerror="this.src='assets/images/no_image.png'"
+                        *ngIf="partenaire?.logo_partenaire"
+                        (click)="Showimage(partenaire)" class="taille_120">
+                    <img src="./assets/images/no_image.png" class="taille_120"
+                        *ngIf="!partenaire?.logo_partenaire">
+                </div>
+            </td>
+            <!-- -------------------------- Logo du partenaire / libellé -------------------------- -->
+            <td class="text-center">
+                <span class="font-weight-bold">
+                    {{partenaire?.libelle_partenaire ? partenaire?.libelle_partenaire : '...'}}
+                </span>
+            </td>
+            <!-- -------------------------------- Ville -------------------------------- -->
+            <td class="text-center">
+                <span style="font-weight: bold">
+                    {{partenaire?.libelle_ville ? partenaire?.libelle_ville : '...'}}
+                </span>
+            </td>
+            <!-- --------------------------------- Autorisation --------------------------------- -->
+            <td class="text-center">
+                <span
+                    class="badge {{partenaire?.badge_autorisation_partenaire ? partenaire?.badge_autorisation_partenaire : 'bg-secondary'}}">
+                    {{partenaire?.label_autorisation_partenaire ? partenaire?.label_autorisation_partenaire : '...'}}
+                </span>
+            </td>
+            <!-- ------------------------------- Actions ------------------------------- -->
+            <td class="text-center">
+                <i class="pi si pi-pencil addpadd" tooltipPosition="left"
+                    pTooltip="Modifier les informations du partenaire : {{partenaire?.libelle_partenaire}} ?"
+                    (click)="ShowFormulaire('modifier',partenaire)">
+                </i>
+                <i class="pi si pi-file addpadd"
+                    pTooltip="Modifier l'image du partenaire : {{partenaire?.libelle_partenaire}} ?"
+                    tooltipPosition="left" (click)="ShowimageUpdate(partenaire)">
+                </i>
+                <i class="pi si pi-trash addpadd"
+                    pTooltip="Supprimer le partenaire : {{partenaire?.libelle_partenaire}} ?" tooltipPosition="left"
+                    (click)="SupprimerPartenaire(partenaire)">
+                </i>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ----------------------------- l'expension ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-partenaire>
+        <tr>
+            <td [attr.colspan]='6'>
+                <p-fieldset legend="Détails du partenaire : {{partenaire?.libelle_partenaire}}">
+                    <div class="row">
+                        <div class="col">
+                            <ul style="font-size: 11px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Type de partenaire :
+                                    </span>
+                                    <span>
+                                        {{
+                                        partenaire?.label_type_societe_partenaire
+                                        ? partenaire?.label_type_societe_partenaire
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Date d'ajout sur le système :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.created_at_formated
+                                        ? partenaire?.created_at_formated
+                                        :'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Email :
+                                    </span>
+                                    <span>
+                                        <a
+                                            href="mailto:{{partenaire?.email_partenaire}}">{{partenaire?.email_partenaire}}</a>
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Téléphone :
+                                    </span>
+                                    <span>
+                                        <a href="tel:{{partenaire?.telephone_partenaire}}">
+                                            {{partenaire?.telephone_partenaire}}
+                                        </a>
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Adresse :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.adresse_partenaire ? partenaire?.adresse_partenaire
+                                        :'...'}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul style="font-size: 11px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Identifiant fiscale :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.identifiant_fiscal_partenaire ?
+                                        partenaire?.identifiant_fiscal_partenaire :'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Registre de commerce :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.registre_commerce_partenaire ?
+                                        partenaire?.registre_commerce_partenaire :'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        I.C.E :
+                                    </span>
+                                    <span style="font-weight: bold">
+                                        {{partenaire?.ice_partenaire ? partenaire?.ice_partenaire : "..."}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        RIB :
+                                    </span>
+                                    <span>
+                                        {{
+                                        partenaire?.rib_partenaire
+                                        ? partenaire?.rib_partenaire
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Description :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.description ? partenaire?.description :'...'}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul style="font-size: 11px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Fax :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.fax_partenaire ? partenaire?.fax_partenaire:'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Dernière date de modification :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.updated_at_formated ?
+                                        partenaire?.updated_at_formated:'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Responsable (nom complet) :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.responsable_nom_complet ?
+                                        partenaire?.responsable_nom_complet
+                                        :'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Téléphone du responsable :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.responsable_telephone ? partenaire?.responsable_telephone
+                                        :'...'}}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Email du responsable :
+                                    </span>
+                                    <span>
+                                        {{partenaire?.responsable_email ? partenaire?.responsable_email
+                                        :'...'}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </p-fieldset>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="6">
+                <div class="text-center">
+                    <div class="center_media">
+                        <img src="./assets/images/no_data.png" width="100px" alt="image no_data">
+                    </div>
+                    <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                    <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                        Chargement ...
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<!-- ---------------- Le formulaire d'ajout et modification ---------------- -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{Header_info}}" [(visible)]="if_show_ajouter"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '60vw'}">
+    <app-formulaire-ajout-update-partenaire [action]="action" [data_partenaire]="data_partenaire"
+        *ngIf="if_show_ajouter" (FermerPopUp)="CloseAjouter()">
+    </app-formulaire-ajout-update-partenaire>
+</p-dialog>
+<!-- ----------------------------------------------------------------------- -->
+<!--                      Popup pour agrandir une image                      -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{desc_image}}" [(visible)]="if_show_image" [modal]="true"
+    [resizable]="false" [maximizable]="true" [baseZIndex]="10000" [style]="{'min-width': '50vw'}">
+    <p-fieldset legend="Logo du partenaire">
+        <div class="d-flex justify-content-center center_media">
+            <div>
+                <img [src]="API_BASE_URL_STORAGE_PARTENAIRES+logo_partenaire" *ngIf="if_show_image" class="img-fluid"
+                    alt="Logo partenaire">
+            </div>
+        </div>
+    </p-fieldset>
+</p-dialog>
+<!-- ----------------------------------------------------------------------- -->
+<!--                           Popup upload image                            -->
+<!-- ----------------------------------------------------------------------- -->
+<p-dialog [dismissableMask]="true" header="{{Header_info}}" [(visible)]="if_show_upload" [resizable]="false"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '50vw'}">
+    <app-partenaire-image [data_partenaire]="data_partenaire" *ngIf="if_show_upload"
+        (FermerPopUp)="CloseImageUopload()">
+    </app-partenaire-image>
+</p-dialog>

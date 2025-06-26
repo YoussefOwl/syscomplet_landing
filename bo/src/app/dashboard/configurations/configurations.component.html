@@ -1,0 +1,21 @@
+<!-- ------------------------------ le header ------------------------------ -->
+<p-breadcrumb [model]="items" [home]="{icon: 'pi pi-home',routerLink:'/accueil'}" (onItemClick)="onItemClick($event)">
+</p-breadcrumb>
+<p-tabView [activeIndex]="lasttab_selected_configurations" (onChange)="indexer($event)">
+    <p-tabPanel header="Liste des utilisateurs" leftIcon="pi pi-id-card"
+        tooltip="Cliquez ici pour gérer les utilisateurs comptes de l'application" tooltipPosition="bottom">
+        <app-liste *ngIf="lasttab_selected_configurations==0"></app-liste>
+    </p-tabPanel>
+    <p-tabPanel header="Gestions des rôles" leftIcon="pi pi-user-plus" tooltipPosition="bottom"
+        tooltip="Cliquez ici pour gérer les différents rôles de l'application">
+        <app-roles *ngIf="lasttab_selected_configurations==1"></app-roles>
+    </p-tabPanel>
+    <p-tabPanel tooltipPosition="bottom" header="Gestion des logs d'activité" leftIcon="pi pi-cloud-upload"
+        tooltip="Cliquez ici pour gérer les logs d'activité">
+        <app-logs *ngIf="lasttab_selected_configurations==2"></app-logs>
+    </p-tabPanel>
+    <p-tabPanel tooltipPosition="bottom" header="Gestion des villes" leftIcon="pi pi-globe"
+        tooltip="Cliquez ici pour gérer les villes">
+        <app-villes *ngIf="lasttab_selected_configurations==3"></app-villes>
+    </p-tabPanel>
+</p-tabView>

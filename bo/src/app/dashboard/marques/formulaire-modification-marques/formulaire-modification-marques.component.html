@@ -1,0 +1,22 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<form [formGroup]="Formulaire" (submit)="onSubmit()">
+    <div class="form-group">
+        <label for="libelle_marque">Libellé de marque *</label>
+        <input id="libelle_marque" formControlName="libelle_marque" class="form-control" placeholder="..." />
+        <div
+            *ngIf="Formulaire.get('libelle_marque').invalid && Formulaire.get('libelle_marque').touched">
+            <small class="text-danger">Le nom est requis.</small>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="description">Observation</label>
+        <textarea id="description" formControlName="description" class="form-control" placeholder="..." rows="3">
+        </textarea>
+    </div>
+    <div class="d-flex justify-content-between mt-2">
+        <button type="button" class="btn btn-red" (click)="ClosePopUp()">Annuler</button>
+        <button type="submit" class="btn btn-vert" [disabled]="Formulaire.invalid">
+            Valider
+        </button>
+    </div>
+</form>

@@ -1,0 +1,58 @@
+.card {
+  background: #ffffff;
+  padding: 1.5rem 1rem;
+  box-shadow: 0px 3px 4px rgb(0 0 0 / 10%), 0px 24px 36px rgb(0 0 0 / 4%);
+  border-radius: 14px;
+  height: min-content;
+}
+.card .card-header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: unset;
+  margin-bottom: 0;
+  background-color: unset;
+  border-bottom: none;
+}
+.card .card-subtitle {
+  color: #7b8794;
+  font-weight: 600;
+  margin: -1rem 0 1rem 0;
+}
+.widget-overview-box.widget-overview-box-1 i {
+  color: #1992d4;
+}
+.widget-overview-box.widget-overview-box-1 .header {
+  color: #1992d4;
+}
+.widget-overview-box.widget-overview-box-2 i {
+  color: #de911d;
+}
+.widget-overview-box.widget-overview-box-2 .header {
+  color: #de911d;
+}
+.widget-overview-box.widget-overview-box-3 i {
+  color: #3ebd93;
+}
+.widget-overview-box.widget-overview-box-3 .header {
+  color: #27ab83;
+}
+.widget-overview-box.widget-overview-box-4 i {
+  color: #896ff4;
+}
+.widget-overview-box.widget-overview-box-4 .header {
+  color: #896ff4;
+}
+.widget-overview-box .header {
+  text-overflow: ellipsis;
+}
+.widget-overview-box > div {
+  margin-bottom: 10%;
+}
+.widget-overview-box img {
+  border-radius: 14px;
+  margin-bottom: -4px;
+}

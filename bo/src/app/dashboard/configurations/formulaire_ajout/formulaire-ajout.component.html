@@ -1,0 +1,111 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<form [formGroup]="formmulaire_ajouter" (ngSubmit)="SubmitAjouter()">
+    <p-fieldset legend="Informations générales :">
+        <div class="d-flex justify-content-center center_media mb-4">
+            <div>
+                <img src="./assets/images/face-scan.gif" width="100" alt="image utilisateur">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Email : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && formmulaire_ajouter.get('email').errors">
+                    * (Requis)
+                </span>
+                <input class="form-control" type="email" formControlName="email" minlength="10" maxlength="100"
+                    placeholder="Veuillez saisir l'email">
+            </div>
+            <div class="col">
+                <label>Mot de passe : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && formmulaire_ajouter.get('password').errors">
+                    * (Requis entre 6 à 30 caractères)
+                </span>
+                <input class="form-control" type="text" formControlName="password" minlength="6" maxlength="30"
+                    placeholder="6 caractères min.">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Rôle : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && formmulaire_ajouter.get('id_role').errors">
+                    * ( Invalide )
+                </span>
+                <p-dropdown [filter]="true" optionLabel="label" optionValue="value" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_roles" formControlName="id_role" placeholder="..."
+                    emptyFilterMessage="Aucun rôle" scrollHeight="110px" class="ng-dirty">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge bg-beige">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="col">
+                <label>Autorisation : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && formmulaire_ajouter.get('has_access').errors">
+                    * ( Invalide )
+                </span>
+                <p-dropdown optionLabel="label" optionValue="value" [resetFilterOnHide]="true" [showClear]="true"
+                    [options]="liste_autorisations" formControlName="has_access" placeholder="Choix d'autorisation"
+                    emptyFilterMessage="..." scrollHeight="110px" class="ng-dirty">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge {{element?.badge}}">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Nom : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && formmulaire_ajouter.get('nom').errors">
+                    * ( Invalide )
+                </span>
+                <input class="form-control" type="text" formControlName="nom" minlength="3" maxlength="30"
+                    placeholder="Veuillez saisir le nom">
+            </div>
+            <div class="col">
+                <label>Prénom : *</label>
+                <span class="label_danger ml-1" *ngIf="IsFiled && formmulaire_ajouter.get('prenom').errors">
+                    * ( Invalide )
+                </span>
+                <input class="form-control" type="text" formControlName="prenom" minlength="3" maxlength="30"
+                    placeholder="Veuillez saisir le prénom">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Activation du son :</label>
+                <input style="margin-left: 8px; margin-right: 5px; transform: translateY(12px);" type="checkbox"
+                    [value]="formmulaire_ajouter.value.if_has_sound" inputId="if_has_sound"
+                    formControlName="if_has_sound">
+                <label for="if_has_sound">
+                    <span class="text-{{formmulaire_ajouter.value.if_has_sound ? 'success' : 'danger'}}">
+                        {{formmulaire_ajouter.value.if_has_sound ? 'Oui' : 'Non'}}
+                    </span>
+                </label>
+            </div>
+        </div>
+    </p-fieldset>
+    <div class="d-flex justify-content-between center_media mt-2">
+        <div>
+            <button type="button" class="btn btn-red mr-2" (click)="ClosePopUp(false)">
+                Fermer
+            </button>
+        </div>
+        <div *ngIf="Ifmessage" [ngClass]="{
+            'font-weight-bold':true,
+            'alert':true,
+            'alert-success':Error==0,
+            'alert-danger':Error==1}">
+            <i class="pi {{Error == 0 ? 'pi-check-square' : 'pi-ban'}}"></i>
+            <span class="ml-2 f_13">{{ApiMessage}}</span>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-vert mr-2" [disabled]="Disabled || is_loading">
+                Valider
+            </button>
+        </div>
+    </div>
+</form>

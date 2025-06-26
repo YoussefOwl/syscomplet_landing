@@ -1,0 +1,164 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<!-- ------------------------- La liste des villes ------------------------- -->
+<p-fieldset legend="Liste des villes : {{totalRecords>0 ? totalRecords+' résultat(s)' : ''}}" [toggleable]="false">
+    <p-table responsiveLayout="scroll" [value]="liste_villes" styleClass="p-datatable-responsive-demo"
+        (onSort)="Sort($event)" [sortOrder]="1" (onPage)="paginate($event)" [paginator]="true" [rows]="take"
+        [rowsPerPageOptions]="[10,20,100]" [totalRecords]="totalRecords" [showCurrentPageReport]="true" [lazy]="true"
+        [(first)]="skip" currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats"
+        [rowHover]="true" sortField="libelle_ville" dataKey="_id" paginatorPosition="both">
+        <!-- ------------------------------- Header -------------------------------- -->
+        <ng-template pTemplate="caption">
+            <div class="d-flex justify-content-between center_media">
+                <button class="btn btn-warning" type="button" (click)="ShowFormulaire('ajouter')" tooltipPosition="left"
+                    pTooltip="Cliquez ici pour ajouter une nouvelle ville">
+                    <i class="fa fa-plus-circle mr-1"></i> Ajouter
+                </button>
+                <button class="btn btn-vert" type="button" [disabled]="liste_villes.length <= 0"
+                    (click)="exportToExcel()" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour exporter toutes les villes">
+                    <i class="fa fa-file-excel-o pr-2"></i> Exporter en excel
+                </button>
+            </div>
+        </ng-template>
+        <!-- ---------------------------- Les colonnes ----------------------------- -->
+        <ng-template pTemplate="header">
+            <tr class="text-center">
+                <th style="width: 3rem"><i class="fa fa-list"></i></th>
+                <th pSortableColumn="libelle_ville">Libellé<p-sortIcon field="libelle_ville"></p-sortIcon>
+                </th>
+                <th pSortableColumn="description">Description<p-sortIcon field="description">
+                    </p-sortIcon>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <!-- -------------------------------- Body --------------------------------- -->
+        <ng-template pTemplate="body" let-dataItem let-expanded="expanded">
+            <tr>
+                <td>
+                    <button type="button" pButton pRipple [pRowToggler]="dataItem"
+                        class="p-button-text p-button-rounded p-button-plain"
+                        [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                        [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                    </button>
+                </td>
+                <td class="text-center">
+                    <span>
+                        {{dataItem?.libelle_ville}}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span>
+                        {{dataItem?.description ? dataItem?.description : '...'}}
+                    </span>
+                </td>
+                <td>
+                    <div class="cm-action-btn">
+                        <i class="pi si pi-pencil addpadd" tooltipPosition="left"
+                            pTooltip="Modifier les informations de la ville : {{dataItem?.libelle_ville}}"
+                            (click)="ShowFormulaire('modifier',dataItem)">
+                        </i>
+                        <i class="pi si pi-trash addpadd" pTooltip="Supprimer le ville : {{dataItem?.libelle_ville}} ?"
+                            tooltipPosition="left" (click)="SupprimerVille(dataItem)">
+                        </i>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <!-- ----------------------------- l'expension ----------------------------- -->
+        <ng-template pTemplate="rowexpansion" let-dataItem>
+            <tr>
+                <td [attr.colspan]='4'>
+                    <p-fieldset legend="Détails de la ville : {{dataItem?.libelle_ville}}">
+                        <div class="row">
+                            <div class="col">
+                                <ul style="font-size: 12px;">
+                                    <li class="mb-2">
+                                        <span class="font-weight-bold">
+                                            Date d'ajout sur le système :
+                                        </span>
+                                        <span>
+                                            {{dataItem?.created_at_formated
+                                            ? dataItem?.created_at_formated
+                                            :'...'}}
+                                        </span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span class="font-weight-bold">
+                                            Dernière date de modification :
+                                        </span>
+                                        <span>
+                                            {{
+                                            dataItem?.updated_at_formated
+                                            ? dataItem?.updated_at_formated
+                                            :'...'
+                                            }}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </p-fieldset>
+                </td>
+            </tr>
+        </ng-template>
+        <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="4">
+                    <div class="text-center">
+                        <div class="center_media">
+                            <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                        </div>
+                        <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                            Aucun enregistrement sur la base de données
+                        </p>
+                        <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                            Chargement ...
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-fieldset>
+<!-- ---------------- Le formulaire d'ajout et modification ---------------- -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{PanelHeader}}" [(visible)]="if_show_dialog"
+    [maximizable]="false" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '40vw'}">
+    <p-fieldset legend="Formulaire :" *ngIf="if_show_dialog">
+        <div class="d-flex justify-content-center center_media mb-2">
+            <div>
+                <img src="./assets/images/ville.svg" width="130px" alt="image ville">
+            </div>
+        </div>
+        <form [formGroup]="Formmulaire" (ngSubmit)="AjouterModifierVille()">
+            <div class="row">
+                <div class="col">
+                    <label>Libellé de la ville : *</label>
+                    <span class="label_danger ml-1" *ngIf="IsFiled && Formmulaire.get('libelle_ville').errors">
+                        * ( Requis 2 caractères )
+                    </span>
+                    <input type="text" class="form-control" formControlName="libelle_ville" minlength="2"
+                        maxlength="100" placeholder="...">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Observation :</label>
+                    <textarea class="form-control" formControlName="description" rows="3"
+                        placeholder="Vous pouvez spécifier plus de détails au niveau de ce champ"></textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between center_media mt-2">
+                <div>
+                    <button type="button" class="btn btn-red" (click)="if_show_dialog=false">Fermer</button>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success" [disabled]="Disabled || is_loading">
+                        Valider
+                    </button>
+                </div>
+            </div>
+        </form>
+    </p-fieldset>
+</p-dialog>

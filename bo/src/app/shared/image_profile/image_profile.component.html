@@ -1,0 +1,57 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<p-fieldset legend="Mis à jour de l'image du profile :">
+    <form (ngSubmit)="ModifierMonImage(copie_image.files)">
+        <div class="row">
+            <div class="col">
+                <p-fileUpload (onSelect)="this.IfNewImage = true" (onRemove)="this.IfNewImage = false"
+                    [showUploadButton]="false" [showCancelButton]="false" accept=".png,.jpg,.jpeg,.gif,.jfif"
+                    [maxFileSize]="2000000" invalidFileSizeMessageDetail="La taille maximale est 2 Mo"
+                    invalidFileSizeMessageSummary="Erreur : " #copie_image chooseLabel="Joindre">
+                    <ng-template pTemplate="content">
+                        <div class="d-flex" *ngIf="!IfNewImage">
+                            <div *ngIf="image_user_path">
+                                <div *ngIf="image_user">
+                                    <img [src]="image_user" class="img_emp"
+                                        onerror="this.src='assets/images/no_image.png'">
+                                    <span class="ml-4">
+                                        <i aria-hidden="true" class="pi si pi-download addpadd"
+                                            pTooltip="Télécharger l'image ?" tooltipPosition="top"
+                                            (click)="TelechargerImage(image_user_path)"></i>
+                                    </span>
+                                    <span class="ml-2">
+                                        <i aria-hidden="true" class="pi si pi-trash addpadd"
+                                            pTooltip="Supprimer l'image ?" tooltipPosition="top"
+                                            (click)="SupprimerMonImage()">
+                                        </i>
+                                    </span>
+                                </div>
+                                <div *ngIf="!image_user">
+                                    <h3 style="padding-top: 15px;">Chargement ...</h3>
+                                </div>
+                            </div>
+                            <div *ngIf="!image_user_path">
+                                <h3 style="padding-top: 15px;">Aucune image</h3>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-fileUpload>
+            </div>
+        </div>
+        <div class="text-center d-flex justify-content-center mt-2">
+            <div *ngIf="Ifmessage" [ngClass]="{
+                'font-weight-bold':true,
+                'alert':true,
+                'alert-success':Error==0,
+                'alert-danger':Error==1}">
+                <i class="pi {{Error == 0 ? 'pi-check-square' : 'pi-ban'}}"></i>
+                <span class="ml-2 f_13">{{ApiMessage}}</span>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-2 center_media">
+            <div>
+                <button type="submit" class="btn btn-vert" [disabled]="Disabled || is_loading">Valider les
+                    modifications</button>
+            </div>
+        </div>
+    </form>
+</p-fieldset>

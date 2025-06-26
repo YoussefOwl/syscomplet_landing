@@ -1,0 +1,56 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<form>
+    <div class="row">
+        <div class="col-12">
+            <label>Logo du partenaire :</label>
+            <p-fileUpload (onSelect)="this.IfNewImage = true" (onRemove)="this.IfNewImage = false"
+                [showUploadButton]="false" [showCancelButton]="false" accept=".png,.jpg,.jpeg,.gif,.jfif"
+                [maxFileSize]="2000000" invalidFileSizeMessageDetail="La taille maximale est 2 MB"
+                invalidFileSizeMessageSummary="Erreur : " #copie_image_partenaire chooseLabel="Joindre">
+                <ng-template pTemplate="content">
+                    <div class="d-flex" *ngIf="!IfNewImage">
+                        <div *ngIf="logo_chemin">
+                            <img [src]="API_BASE_URL_STORAGE_PARTENAIRES+logo_chemin" class="taille_80"
+                                style="object-fit: contain;" alt="image logo partenaire"
+                                onerror="this.src='assets/images/no_image.png'">
+                            <span class="ml-4">
+                                <i class="pi si pi-download addpadd" pTooltip="Télécharger l'image du partenaire ?"
+                                    tooltipPosition="top" (click)="TelechargerLogo(logo_chemin)">
+                                </i>
+                            </span>
+                            <span class="ml-2">
+                                <i class="pi si pi-trash addpadd" pTooltip="Supprimer l'image du partenaire ?"
+                                    tooltipPosition="top" (click)="SupprimerImagePartenaire(logo_chemin)">
+                                </i>
+                            </span>
+                        </div>
+                        <div *ngIf="!logo_chemin">
+                            <h3 style="padding-top: 15px;" *ngIf="is_loading">Chargement ...</h3>
+                            <h3 style="padding-top: 15px;" *ngIf="!is_loading">Aucune image</h3>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-fileUpload>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between center_media mt-2">
+        <div>
+            <button type="button" class="btn btn-red" (click)="ClosePopUp()"
+                pTooltip="Cliquez ici pour fermer le formulaire" tooltipPosition="top">Fermer</button>
+        </div>
+        <div *ngIf="Ifmessage_logo" [ngClass]="{
+                'font-weight-bold':true,
+               'alert':true,
+               'alert-success':Error==0,
+               'alert-danger':Error==1}">
+            <i class="pi {{Error == 0 ? 'pi-check-square' : 'pi-ban'}}"></i>
+            <span class="ml-4">{{ApiMessage_logo}}</span>
+        </div>
+        <div>
+            <button type="button" class="btn btn-vert" [disabled]="Disabled_logo || is_loading"
+                (click)="ModifierImagePartenaire(copie_image_partenaire.files)">
+                Valider
+            </button>
+        </div>
+    </div>
+</form>

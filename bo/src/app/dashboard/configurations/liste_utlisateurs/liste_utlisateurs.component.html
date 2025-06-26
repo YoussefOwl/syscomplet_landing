@@ -1,0 +1,278 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<!-- -------------------- Le formulaire de la recherche --------------------- -->
+<p-fieldset
+    legend="Formulaire de recherche des utilisateurs de l'application : {{totalRecords ? totalRecords+' résultat(s)' : ''}}">
+    <form [formGroup]="FormmulaireRecherche" (ngSubmit)="RechercherUtilisateur()">
+        <div class="row">
+            <div class="col">
+                <label>Nom ou prénom</label>
+                <input class="form-control" type="text" formControlName="nom_complet"
+                    placeholder="Recherche par nom ou prénom d'utilisateur">
+            </div>
+            <div class="col">
+                <label>Autorisation</label>
+                <p-dropdown optionLabel="label" optionValue="value" [resetFilterOnHide]="true" [showClear]="true"
+                    [options]="liste_autorisations" formControlName="has_access" placeholder="Choix d'autorisation"
+                    emptyFilterMessage="..." scrollHeight="110px" class="ng-dirty" [filter]="true">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge {{element?.badge}}">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button class="btn btn-warning mr-2" type="button" (click)="ShowUtilisateur('ajouter')"
+                    tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour ajouter un nouveau compte d'utilisateur de l'application">
+                    <i class="fa fa-plus-circle mr-1"></i> Ajouter un utilisateur
+                </button>
+                <button class="btn btn-vert" type="button" [disabled]="ListeUtilisateurs.length <= 0"
+                    (click)="exportToExcel()" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour exporter tous les utilisateurs">
+                    <i class="fa fa-file-excel-o pr-2"></i> Exporter en excel
+                </button>
+            </div>
+            <div>
+                <i class="pi si pi-filter-slash addpadd mr-2" tooltipPosition="left" pTooltip="Vider le formulaire"
+                    (click)="ClearSearch()">
+                </i>
+                <button type="submit" class="btn btn-dark" style="font-size: 11px !important;" [disabled]="is_loading">
+                    <i class="fa fa-search mr-1"></i> Rechercher / Rafraîchir
+                </button>
+            </div>
+        </div>
+    </form>
+</p-fieldset>
+<!-- ------------------------- La liste des utilisateurs ------------------------- -->
+<p-table responsiveLayout="scroll" [value]="ListeUtilisateurs" styleClass="p-datatable-responsive-demo"
+    (onSort)="Sort($event)" [sortOrder]="-1" (onPage)="paginate($event)" [paginator]="true" [rows]="take"
+    [rowsPerPageOptions]="[10,20,100]" sortField="has_access" [totalRecords]="totalRecords" [lazy]="true"
+    [(first)]="skip" [showCurrentPageReport]="true" dataKey="_id" paginatorPosition="both"
+    currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats" [rowHover]="true">
+    <!-- ----------------------- Les colonnes du header ------------------------ -->
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem"><i class="fa fa-list"></i></th>
+            <th>Image</th>
+            <th pSortableColumn="id_role">Rôle<p-sortIcon field="libelle_role"></p-sortIcon>
+            </th>
+            <th pSortableColumn="nom">Nom<p-sortIcon field="nom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="prenom">Prénom<p-sortIcon field="prenom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="has_access">Autorisation<p-sortIcon field="has_access"></p-sortIcon>
+            </th>
+            <th [ngStyle]="{'width':'250px'}">Actions</th>
+        </tr>
+    </ng-template>
+    <!-- -------------------------------- Le body --------------------------------- -->
+    <ng-template pTemplate="body" let-utilisateur let-expanded="expanded">
+        <tr [style]="'background-color:'+(expanded ? ' rgb(223, 223, 223);': '')">
+            <!-- ----------------------- Le button d'expenssion ------------------------ -->
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="utilisateur"
+                    class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <!-- ------------------------- Image d'utilisateur -------------------------- -->
+            <td>
+                <div *ngIf="is_loading">
+                    <p>
+                        Chargement ...
+                    </p>
+                </div>
+                <div *ngIf="!is_loading">
+                    <img [src]="utilisateur?.image_user" class="taille_60" alt="Image utilisateur"
+                        *ngIf="utilisateur?.image_user && utilisateur?.image_user_path"
+                        onerror="this.src='assets/images/no_image.png'">
+                    <img src="./assets/images/no_image.png" alt="Image utilisateur"
+                        *ngIf="!utilisateur?.image_user || !utilisateur?.image_user_path" class="taille_60">
+                </div>
+            </td>
+            <!-- -------------------------------- Rôle --------------------------------- -->
+            <td>
+                <span class="badge bg-beige">
+                    {{utilisateur?.libelle_role}}
+                </span>
+            </td>
+            <!-- --------------------------------- Nom --------------------------------- -->
+            <td class="text-center">
+                <span>
+                    {{utilisateur?.nom}}
+                </span>
+            </td>
+            <!-- ------------------------------- Prénom -------------------------------- -->
+            <td class="text-center">
+                <span>
+                    {{utilisateur?.prenom}}
+                </span>
+            </td>
+            <!-- ------------------------------ Le statut ------------------------------ -->
+            <td class="text-center">
+                <span class="badge {{utilisateur?.badge_has_access}}">
+                    {{utilisateur?.label_has_access}}
+                </span>
+            </td>
+            <!-- ----------------------------- Les actions ----------------------------- -->
+            <td class="text-center">
+                <div *ngIf="!is_loading">
+                    <div *ngIf="utilisateur?.if_can_update_line_user">
+                        <i class="pi si pi-pencil addpadd" tooltipPosition="left"
+                            pTooltip="Modification des informations ({{utilisateur?.libelle_role}} : {{utilisateur?.nom_complet}}) ?"
+                            (click)="ShowUtilisateur('modifier',utilisateur)">
+                        </i>
+                        <i class="pi si pi-file addpadd"
+                            pTooltip="Modifier l'image ({{utilisateur?.libelle_role}} : {{utilisateur?.nom_complet}}) ?"
+                            tooltipPosition="left" (click)="ShowimageUpdate(utilisateur)">
+                        </i>
+                        <i class="pi si pi-key addpadd" tooltipPosition="left"
+                            pTooltip="Modification du mot de passe ({{utilisateur?.libelle_role}} : {{utilisateur?.nom_complet}}) ?"
+                            (click)="ShowUpdatePassWord(utilisateur)">
+                        </i>
+                        <i class="pi si pi-cog addpadd" tooltipPosition="left"
+                            pTooltip="Modification des paramétrages ({{utilisateur?.libelle_role}} : {{utilisateur?.nom_complet}}) ?"
+                            (click)="ShowUpdateParams(utilisateur)">
+                        </i>
+                        <i class="pi si pi-trash addpadd"
+                            pTooltip="Suppression ({{utilisateur?.libelle_role}} : {{utilisateur?.nom_complet}}) ?"
+                            tooltipPosition="left" (click)="SupprimerUtilisateur(utilisateur)">
+                        </i>
+                    </div>
+                    <div *ngIf="!utilisateur?.if_can_update_line_user">
+                        <span>
+                            Aucune action
+                        </span>
+                    </div>
+                </div>
+                <div *ngIf="is_loading">
+                    <span>
+                        Chargement ...
+                    </span>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ----------------------------- l'expension ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-utilisateur>
+        <tr  style="background:rgb(223, 223, 223);">
+            <td [attr.colspan]='7'>
+                <!-- --------------------- Les détails supplémentaires --------------------- -->
+                <p-fieldset legend="Détails d'utilisateur : {{utilisateur?.nom_complet}}">
+                    <div class="row">
+                        <div class="col">
+                            <ul style="font-size: 12px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Dernière date de modification :
+                                    </span>
+                                    <span>
+                                        {{
+                                        utilisateur?.updated_at_formated
+                                        ? utilisateur?.updated_at_formated
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Identifiant interne :
+                                    </span>
+                                    <span>
+                                        {{ utilisateur?.base_id }}
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Activation du son :
+                                    </span>
+                                    <span style="color:{{utilisateur?.if_has_sound ? 'green' : 'red'}};">
+                                        {{ utilisateur?.if_has_sound ? 'Oui' : 'Non'}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul style="font-size: 12px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Email :
+                                    </span>
+                                    <span>
+                                        <a href="mailto:{{utilisateur?.email}}">{{utilisateur?.email}}</a>
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Date d'ajout sur le système :
+                                    </span>
+                                    <span>
+                                        {{utilisateur?.created_at_formated ?
+                                        utilisateur?.created_at_formated : '...'}}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </p-fieldset>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="7">
+                <div class="text-center">
+                    <div class="center_media">
+                        <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                    </div>
+                    <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                    <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                        Chargement ...
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<!-- ----------------------------------------------------------------------- -->
+<!--                 Les pop_ups de gestion des utilisteurs                  -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ------------- Popup modification info profile utilisateur ------------- -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{Header_info}}" [(visible)]="if_show_info"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [closable]="true" [style]="{'min-width': '40vw'}">
+    <app-informations [id_user]="id_user" [source]="'administration'" *ngIf="if_show_info"
+        (FermerPopUp)="CloseUpdate()">
+    </app-informations>
+</p-dialog>
+<!-- ---------------------- Popup modification image de profile ---------------------- -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{Header_info}}" [(visible)]="if_show_image"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '40vw'}">
+    <app-image-profile [id_user]="id_user" *ngIf="if_show_image" [image]="image_path" [source]="'administration'"
+        (FermerPopUp)="CloseImages()">
+    </app-image-profile>
+</p-dialog>
+<!-- ----------------- Popup modification de mot de passe ------------------ -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{Header_info}}" [(visible)]="if_show_password"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '40vw'}">
+    <app-password *ngIf="if_show_password" [id_user]="id_user" [source]="'administration'"
+        (FermerPopUp)="ClosePassword()">
+    </app-password>
+</p-dialog>
+<!-- ------------------ PopUp pour ajouter un utilisateur ------------------ -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{Header_info}}" [(visible)]="if_show_ajouter"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '40vw'}">
+    <app-formulaire-ajout *ngIf="if_show_ajouter" (FermerPopUp)="CloseAjouter($event)"></app-formulaire-ajout>
+</p-dialog>
+<!-- --------- Popup pour modifier les paramètres d'un utilisateur --------- -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{Header_info}}" [(visible)]="if_show_parametrage"
+    [maximizable]="true" [modal]="true" [baseZIndex]="10000" [style]="{'min-width': '40vw'}">
+    <app-formulaire-parametrage *ngIf="if_show_parametrage" [data_user]="data_user" (FermerPopUp)="CloseParametres()">
+    </app-formulaire-parametrage>
+</p-dialog>

@@ -1,0 +1,293 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<div class="d-flex justify-content-center center_media mb-2">
+    <div>
+        <img src="./assets/images/roles.svg" class='worker' alt="image verify">
+    </div>
+</div>
+<!-- -------------------- Le formulaire de la recherche --------------------- -->
+<p-fieldset legend="Formulaire de recherche : {{totalRecords ? totalRecords+' rôle(s)' : ''}}">
+    <form [formGroup]="FormmulaireRecherche" (ngSubmit)="Rechercher()">
+        <div class="row">
+            <div class="col">
+                <label>Libellé du rôle</label>
+                <input class="form-control" type="text" formControlName="libelle_role" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Description du rôle</label>
+                <input class="form-control" type="text" formControlName="description" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Acronym du rôle</label>
+                <input class="form-control" type="text" formControlName="acronym_role" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Menu du rôle</label>
+                <input class="form-control" type="text" formControlName="sidebar" placeholder="...">
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button class="btn btn-warning mr-2" type="button" (click)="ShowUpdateAddRole()"
+                    tooltipPosition="bottom" pTooltip="Cliquez ici pour ajouter un nouveau rôle"
+                    *ngIf="if_can_manage_roles">
+                    <i class="fa fa-plus-circle mr-1"></i> Ajouter un rôle
+                </button>
+                <button class="btn btn-vert" type="button" [disabled]="ListeRoles.length <= 0"
+                    (click)="exportToExcelOrCSV('excel')" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour exporter en excel">
+                    <i class="fa fa-file-excel-o pr-2"></i> Exporter en excel
+                </button>
+            </div>
+            <div>
+                <i class="pi si pi-filter-slash addpadd" tooltipPosition="left" pTooltip="Vider le formulaire"
+                    (click)="ClearSearch()">
+                </i>
+                <button type="submit" class="btn btn-dark" style="font-size: 11px !important;" [disabled]="is_loading">
+                    <i class="fa fa-search mr-1"></i> Rechercher / Rafraîchir
+                </button>
+            </div>
+        </div>
+    </form>
+</p-fieldset>
+<!-- ------------------------- La liste des roles ------------------------- -->
+<p-table responsiveLayout="scroll" [value]="ListeRoles" styleClass="p-datatable-responsive-demo" (onSort)="Sort($event)"
+    [sortOrder]="1" (onPage)="paginate($event)" [paginator]="true" [rows]="take" [rowsPerPageOptions]="[10,20,50]"
+    [totalRecords]="totalRecords" [lazy]="true" [(first)]="skip" [showCurrentPageReport]="true" dataKey="_id"
+    currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats" [rowHover]="true"
+    sortField="id" rowExpandMode="single" paginatorPosition="both">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem"><i class="fa fa-list"></i></th>
+            <th pSortableColumn="id">Identifiant interne<p-sortIcon field="id"></p-sortIcon>
+            </th>
+            <th pSortableColumn="libelle_role">Libellé du rôle<p-sortIcon field="libelle_role"></p-sortIcon>
+            </th>
+            <th pSortableColumn="acronym_role">Acronym du rôle<p-sortIcon field="acronym_role"></p-sortIcon>
+            </th>
+            <th pSortableColumn="created_at">Date de création<p-sortIcon field="created_at"></p-sortIcon>
+            </th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </ng-template>
+    <!-- -------------------------------- Body --------------------------------- -->
+    <ng-template pTemplate="body" let-dataItem let-expanded="expanded">
+        <tr>
+            <!-- ----------------------- Le button d'expenssion ------------------------ -->
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="dataItem"
+                    class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <td>
+                <span class="badge bg-dark">
+                    {{dataItem?.id}}
+                </span>
+            </td>
+            <td>
+                <span class="badge bg-beige">
+                    {{dataItem?.libelle_role}}
+                </span>
+                <span>
+                    {{dataItem?.sidebar && dataItem?.sidebar?.length>0 ? '(avec un menu)' : ''}}
+                </span>
+            </td>
+            <td>
+                <span class="badge bg-beige">
+                    {{dataItem?.acronym_role ? dataItem?.acronym_role : '...'}}
+                </span>
+            </td>
+            <td>
+                <span class="badge bg-beige">
+                    {{dataItem?.created_at_formated ? dataItem?.created_at_formated : '...'}}
+                </span>
+            </td>
+            <td>
+                <span class="badge bg-beige">
+                    {{dataItem?.description ? dataItem?.description : '...'}}
+                </span>
+            </td>
+            <!-- ----------------------------- Les actions ----------------------------- -->
+            <td>
+                <div *ngIf="!is_loading">
+                    <i class="pi si pi-pencil addpadd" tooltipPosition="left" *ngIf="if_can_manage_roles"
+                        pTooltip="Modification du rôle {{dataItem?.libelle_role}} ?"
+                        (click)="ShowUpdateAddRole(dataItem)">
+                    </i>
+                    <span *ngIf="!if_can_manage_roles">
+                        Aucune action
+                    </span>
+                </div>
+                <span *ngIf="is_loading">
+                    Chargement ...
+                </span>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ----------------------------- l'expension ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-dataItem>
+        <tr>
+            <td [attr.colspan]='7'>
+                <div class="row">
+                    <div class="col">
+                        <ul style="font-size: 12px;">
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Identifiant md5_basae64 :
+                                </span>
+                                <span>
+                                    {{
+                                    dataItem?.id_md5_base64_encode
+                                    ? dataItem?.id_md5_base64_encode
+                                    :'...'
+                                    }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <ul style="font-size: 12px;">
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Identifiant basae64 :
+                                </span>
+                                <span>
+                                    {{
+                                    dataItem?.id_base64_encode
+                                    ? dataItem?.id_base64_encode
+                                    :'...'
+                                    }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <ul style="font-size: 12px;">
+                            <li class="mb-2">
+                                <span class="font-weight-bold">
+                                    Dernière date de modification :
+                                </span>
+                                <span>
+                                    {{
+                                    dataItem?.updated_at_formated
+                                    ? dataItem?.updated_at_formated
+                                    :'...'
+                                    }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <p-fieldset legend="Sidebar menu du rôle {{dataItem?.libelle_role}} sous format JSON :"
+                            [toggleable]="false">
+                            <pre style="font-size: 10px !important; height: 200px; overflow: auto;"
+                                [innerHTML]="dataItem?.sidebar | prettyjson">
+                            </pre>
+                        </p-fieldset>
+                    </div>
+                    <div class="col">
+                        <p-fieldset legend="Sidebar menu du rôle {{dataItem?.libelle_role}} :" [toggleable]="false">
+                            <ul style="height: 200px; overflow: auto;" class="text-center">
+                                <li *ngFor="let menu of dataItem?.sidebar">
+                                    <button class="btn mb-3 font-weight-bold"
+                                        style="width: 80%;padding: 7px 0;white-space: break-spaces;"
+                                        [ngClass]="{'btn-dark' : true}">
+                                        <i class="{{menu?.icon}} mr-2" aria-hidden="true"> </i>
+                                        <span style="font-size: 9px !important">{{menu?.title}}</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </p-fieldset>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="7">
+                <div class="text-center">
+                    <div class="center_media">
+                        <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                    </div>
+                    <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                    <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                        Chargement ...
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<!-- ---------------- Formulaire d'ajout et de modification ---------------- -->
+<p-dialog [dismissableMask]="true" [resizable]="false" header="{{DialogHeader}}" [(visible)]="if_show_dialog"
+    [maximizable]="false" [modal]="true" [baseZIndex]="10000" class="cm-dialog" [style]="{'min-width': '70vw'}">
+    <p-fieldset legend="{{PanelHeader}}" *ngIf="if_show_dialog">
+        <form [formGroup]="FormmulaireRoles" (ngSubmit)="SubmitFom()">
+            <div class="d-flex justify-content-between center_media mb-2">
+                <div class="mt-auto">
+                    <button type="button" class="btn btn-red" (click)="if_show_dialog=false">Fermer</button>
+                </div>
+                <div>
+                    <img src="./assets/images/roles.svg" width="130px" alt="roles image">
+                </div>
+                <div class="mt-auto">
+                    <button type="submit" class="btn btn-vert" [disabled]="Disabled || is_loading">
+                        Valider
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Libellé du rôle *</label>
+                    <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireRoles.get('libelle_role').errors">
+                        * ( Requis 3 caractères )
+                    </span>
+                    <input type="text" class="form-control" formControlName="libelle_role" minlength="3" maxlength="100"
+                        placeholder="...">
+                </div>
+                <div class="col">
+                    <label>Acronym du rôle *</label>
+                    <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireRoles.get('acronym_role').errors">
+                        * ( Requis )
+                    </span>
+                    <input type="text" class="form-control" formControlName="acronym_role" maxlength="100"
+                        placeholder="...">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Sidebar menu * :</label>
+                    <span class="label_danger ml-1" *ngIf="IsFiled && FormmulaireRoles.get('sidebar').errors">
+                        * ( Requis sous format json )
+                    </span>
+                    <textarea class="form-control" formControlName="sidebar" rows="15" placeholder="..."></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Description (facultative) :</label>
+                    <textarea class="form-control" formControlName="description" rows="2"
+                        placeholder="Vous pouvez spécifier plus de détails au niveau de ce champ"></textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between center_media mt-2">
+                <div>
+                    <button type="button" class="btn btn-red" (click)="if_show_dialog=false">Fermer</button>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-vert" [disabled]="Disabled || is_loading">
+                        Valider
+                    </button>
+                </div>
+            </div>
+        </form>
+    </p-fieldset>
+</p-dialog>

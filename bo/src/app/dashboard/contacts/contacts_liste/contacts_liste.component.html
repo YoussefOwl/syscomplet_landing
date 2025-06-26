@@ -1,0 +1,250 @@
+<app-loader *ngIf="is_loading"></app-loader>
+<!-- -------------------- Le formulaire de la recherche --------------------- -->
+<p-fieldset
+    legend="Formulaire de recherche des demandes de contacts : {{totalRecords ? totalRecords+' résultat(s)' : ''}}"
+    [toggleable]="false">
+    <form [formGroup]="FormmulaireRecherche" (ngSubmit)="Rechercher()">
+        <div class="row">
+            <div class="col">
+                <label>Entre le</label>
+                <input class="form-control" type="date" formControlName="debut">
+            </div>
+            <div class="col">
+                <label>Et le</label>
+                <input class="form-control" type="date" formControlName="fin">
+            </div>
+            <div class="col">
+                <label>État de la demande</label>
+                <p-dropdown optionLabel="label" optionValue="value" appendTo="body" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_status_contact" formControlName="status_contact"
+                    [filter]="false" class="ng-dirty" placeholder="..." emptyFilterMessage="..." scrollHeight="110px">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge {{element?.badge}}">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+            <div class="col">
+                <label>Sujet</label>
+                <p-dropdown optionLabel="label" optionValue="value" appendTo="body" [resetFilterOnHide]="true"
+                    [showClear]="true" [options]="liste_sujet_contact" formControlName="sujet_contact" [filter]="true"
+                    class="ng-dirty" placeholder="..." emptyFilterMessage="..." [virtualScroll]="true"
+                    [virtualScrollItemSize]="38" scrollHeight="110px">
+                    <ng-template let-element pTemplate="item">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-11 badge bg-beige">{{element?.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Email</label>
+                <input class="form-control" type="text" formControlName="email_contact" maxlength="200"
+                    placeholder="...">
+            </div>
+            <div class="col">
+                <label>Nom complet</label>
+                <input class="form-control" type="text" formControlName="first_and_last_name" maxlength="200"
+                    placeholder="...">
+            </div>
+            <div class="col">
+                <label>Adresse (IP)</label>
+                <input class="form-control" type="text" formControlName="adresse_ip" maxlength="200" placeholder="...">
+            </div>
+            <div class="col">
+                <label>Message</label>
+                <input class="form-control" type="text" formControlName="message_contact" maxlength="200"
+                    placeholder="...">
+            </div>
+        </div>
+        <div class="d-flex justify-content-between center_media mt-2">
+            <div>
+                <button class="btn btn-vert" type="button" [disabled]="liste_contacts?.length <= 0"
+                    (click)="export('excel')" tooltipPosition="bottom"
+                    pTooltip="Cliquez ici pour exporter toutes les demandes de contacts sous format excel">
+                    <i class="fa fa-file-excel-o mr-1"></i> Exporter en excel
+                </button>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-dark" [disabled]="is_loading" style="font-size: 11px !important;">
+                    <i class="fa fa-search mr-1"></i> Rechercher / Rafraîchir
+                </button>
+                <i class="ml-2 pi si pi-filter-slash addpadd mr-1" tooltipPosition="left"
+                    pTooltip="Cliquez ici pour vider le formulaire" (click)="ClearSearch()">
+                </i>
+            </div>
+        </div>
+    </form>
+</p-fieldset>
+<!-- ------------------------- La liste des demandes de contacts ------------------------- -->
+<p-table responsiveLayout="scroll" [value]="liste_contacts"
+    styleClass="p-datatable-responsive-demo p-datatable-gridlines" (onSort)="Sort($event)" (onPage)="paginate($event)"
+    [paginator]="true" [rows]="take" [rowsPerPageOptions]="[10,15,20]" [totalRecords]="totalRecords" [lazy]="true"
+    [(first)]="skip" [showCurrentPageReport]="true" dataKey="_id" [sortOrder]="-1" rowExpandMode="single"
+    currentPageReportTemplate="Pagination d'affichage {first} à {last} de {totalRecords} résultats" [rowHover]="true"
+    sortField="date_contact" paginatorPosition="both">
+    <!-- ---------------------------- Les colonnes ----------------------------- -->
+    <ng-template pTemplate="header">
+        <tr style="text-align: center;">
+            <th style="width: 3rem"><i class="fa fa-list"></i></th>
+            <th pSortableColumn="sujet_contact">Sujet<p-sortIcon field="sujet_contact"></p-sortIcon></th>
+            <th pSortableColumn="status_contact">État<p-sortIcon field="status_contact"></p-sortIcon></th>
+            <th pSortableColumn="email_contact">Email<p-sortIcon field="email_contact"></p-sortIcon></th>
+            <th pSortableColumn="first_and_last_name">Nom complet<p-sortIcon field="first_and_last_name"></p-sortIcon></th>
+            <th pSortableColumn="date_contact">Date<p-sortIcon field="date_contact"></p-sortIcon></th>
+            <th>Actions</th>
+        </tr>
+    </ng-template>
+    <!-- -------------------------------- Body --------------------------------- -->
+    <ng-template pTemplate="body" let-dataItem let-expanded="expanded">
+        <tr>
+            <!-- ----------------------------- Identifiant ----------------------------- -->
+            <td class="text-center">
+                <span style="font-size: 10px; font-weight: bold; font-family: monospace !important;">
+                    {{dataItem?.base_id}}
+                </span>
+                <button type="button" pButton pRipple [pRowToggler]="dataItem"
+                    class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-minus-circle' : 'pi pi-question-circle'" tooltipPosition="left"
+                    [pTooltip]="expanded ? 'Masquer les détails de cette ligne ?' : 'Afficher plus de détails concernant cette ligne ?'">
+                </button>
+            </td>
+            <!-- -------------------------------- Sujet -------------------------------- -->
+            <td class="text-center">
+                <span class="font-weight-bold">
+                    {{dataItem?.label_sujet_contact}}
+                </span>
+            </td>
+            <!-- -------------------------------- État --------------------------------- -->
+            <td class="text-center">
+                <span class="badge {{dataItem?.badge_status_contact}}">
+                    {{dataItem?.label_status_contact}}
+                </span>
+            </td>
+            <!-- -------------------------------- Email -------------------------------- -->
+            <td class="text-center">
+                <span class="font-weight-bold">
+                    {{dataItem?.email_contact}}
+                </span>
+            </td>
+            <!-- ------------------------------- Client -------------------------------- -->
+            <td class="text-center">
+                <span class="font-weight-bold">
+                    {{dataItem?.first_and_last_name}}
+                </span>
+            </td>
+            <!-- -------------------------------- Date --------------------------------- -->
+            <td class="text-center">
+                <span class="font-weight-bold">
+                    {{dataItem?.date_contact_formated}}
+                </span>
+            </td>
+            <!-- ------------------------------- Action -------------------------------- -->
+            <td class="text-center">
+                <i class="pi si {{dataItem?.is_finished ? 'pi-thumbs-down' : 'pi-thumbs-up'}} addpadd"
+                    style="background-color: {{dataItem?.is_finished ? '#ccad3d' : 'green'}}; color:#fffffff; border-color: {{dataItem?.is_finished ? '#ccad3d' : 'green'}}"
+                    pTooltip="{{dataItem?.is_finished ? 'Relancer' : 'Clôturer'}} la demande de contact : {{dataItem?.base_id}}?"
+                    tooltipPosition="left" (click)="ModifierContacts(dataItem?._id)">
+                </i>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ----------------------------- l'expension ----------------------------- -->
+    <ng-template pTemplate="rowexpansion" let-dataItem>
+        <tr>
+            <td [attr.colspan]='7'>
+                <p-fieldset legend="Détails de la demande de contact : {{dataItem?.base_id}}">
+                    <div class="row">
+                        <div class="col">
+                            <ul style="font-size: 12px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Date d'ajout sur le système :
+                                    </span>
+                                    <span>
+                                        {{
+                                        dataItem?.created_at_formated
+                                        ? dataItem?.created_at_formated
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul style="font-size: 12px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Dernière date de modification :
+                                    </span>
+                                    <span>
+                                        {{
+                                        dataItem?.updated_at_formated
+                                        ? dataItem?.updated_at_formated
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul style="font-size: 12px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Adresse IP :
+                                    </span>
+                                    <span>
+                                        {{
+                                        dataItem?.adresse_ip
+                                        ? dataItem?.adresse_ip
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <ul style="font-size: 12px;">
+                                <li class="mb-2">
+                                    <span class="font-weight-bold">
+                                        Message :
+                                    </span>
+                                    <span>
+                                        {{
+                                        dataItem?.message_contact
+                                        ? dataItem?.message_contact
+                                        : '...'
+                                        }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </p-fieldset>
+            </td>
+        </tr>
+    </ng-template>
+    <!-- ------------------ Le Footer en cas d'une table vide ------------------ -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="7">
+                <div class="text-center">
+                    <div class="center_media">
+                        <img src="./assets/images/no_data.png" width="80px" alt="image no_data">
+                    </div>
+                    <p *ngIf="!is_loading" class="font-weight-bold mt-2">
+                        Aucun enregistrement sur la base de données
+                    </p>
+                    <p *ngIf="is_loading" class="font-weight-bold mt-2">
+                        Chargement ...
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

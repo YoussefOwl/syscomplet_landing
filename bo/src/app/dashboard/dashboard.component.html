@@ -1,0 +1,37 @@
+<!-- ----------------------------------------------------------------------- -->
+<!--                                 Layout                                  -->
+<!-- ----------------------------------------------------------------------- -->
+<div class="wrapper default-theme" [ngClass]="getClasses()">
+  <!-- ----------------------------------------------------------------------- -->
+  <!--                             Layout sidebar                              -->
+  <!-- ----------------------------------------------------------------------- -->
+  <div class="layout-sidebar">
+    <app-sidebar></app-sidebar>
+    <div class="overlay" (click)="toggleSidebar()"></div>
+  </div>
+  <!-- ----------------------------------------------------------------------- -->
+  <!--                               Layout main                               -->
+  <!-- ----------------------------------------------------------------------- -->
+  <div class="layout-main">
+    <div>
+      <app-navbar></app-navbar>
+      <p-progressBar mode="indeterminate" [style]="{'height': '2px'}" *ngIf="generalService.is_loading">
+      </p-progressBar>
+    </div>
+    <div style="overflow-y: scroll;">
+      <div>
+        <main>
+          <div class="pages container-fluid p-3">
+            <div id="top_bar_html"></div>
+            <router-outlet></router-outlet>
+          </div>
+        </main>
+      </div>
+      <!-- ----------------------  placed to the top end ---------------------- -->
+      <p-scrollTop target="parent"></p-scrollTop>
+      <div>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
+</div>
