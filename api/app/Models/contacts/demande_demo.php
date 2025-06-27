@@ -12,6 +12,7 @@ class demande_demo extends Model
         "phone_demandeur",
         "entreprise_demandeur",
         "message_demandeur",
+        "vu",
     ];
     protected $table = 'demande_demo';
 }

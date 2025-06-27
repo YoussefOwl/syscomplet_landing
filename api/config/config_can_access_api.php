@@ -124,5 +124,12 @@ return [
             md5(base64_encode(intval(env('identifiant_role_admin')))),
             md5(base64_encode(intval(env('identifiant_role_manager')))),
         ],
+    ],
+    [
+        'key'   => "group_roles_for_demande_demo",
+        'value' => [
+            md5(base64_encode(intval(env('identifiant_role_admin')))),
+            md5(base64_encode(intval(env('identifiant_role_manager')))),
+        ],
     ]
 ];

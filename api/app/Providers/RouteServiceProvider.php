@@ -22,6 +22,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiFournisseurRoutes();
         $this->mapApiArticlesRoutes();
         $this->mapApiMarquesRoutes();
+        $this->mapApiContactRoutes();
     }
     protected function mapWebRoutes()
     {
@@ -84,5 +85,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('api_marques')
             ->namespace($this->namespace)
             ->group(base_path('routes/api_marques.php'));
+    }
+    protected function mapApiContactRoutes()
+    {
+        Route::prefix('api_contact')
+            ->middleware('api_contact')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api_contact.php'));
     }
 }

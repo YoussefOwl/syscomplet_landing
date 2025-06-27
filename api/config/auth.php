@@ -66,6 +66,10 @@ return [
         'api_marques' => [
             'driver' => 'jwt',
             'provider' => 'users',
+        ],
+        'api_contact' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
         ]
     ],
     /*

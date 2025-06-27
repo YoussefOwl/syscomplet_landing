@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('email_demandeur');
             $table->string('phone_demandeur');
             $table->string('entreprise_demandeur')->nullable();
+            $table->string('vu')->default(0);
             $table->text('message_demandeur')->nullable();
             $table->timestamps();
         });

@@ -88,6 +88,12 @@ const routes: Routes = [
         data: { roles: 'can_access_marques' },
         loadChildren: () => import('./marques/marques.module').then(g => g.MarquesModule)
       },
+      {
+        path: 'demande_demo',
+        canActivate: [AuthGuard, RolesGuard],
+        data: { roles: 'can_access_demande_demo' },
+        loadChildren: () => import('./contact/demande-demo.module').then(g => g.DemandeDemoModule)
+      },
       { path: '**', redirectTo: 'accueil', pathMatch: 'full' }
     ]
   },
@@ -102,7 +108,7 @@ const routes: Routes = [
     DashboardComponent,
     NavbarComponent,
     SidebarComponent,
-    FooterComponent,
+    FooterComponent
   ],
   imports: [
     CommonModule,

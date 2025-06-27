@@ -156,6 +156,7 @@ tbody .p-fieldset .p-fieldset-content {
   display: none !important;
 }
 .p-datatable-thead > tr > th {
+  text-align: center !important;
   background: #f4f7fc !important;
   border-width: 1px 0 1px 1px !important;
   border: 1px solid #e9ecef !important;
@@ -992,5 +993,8 @@ option {
 }
 .ck-editor__editable_inline {
   min-height: 300px !important;
+}
+.bg-none {
+  background: none !important;
 }
 @import "query_media.scss";

@@ -90,7 +90,7 @@ export class ApiService {
     } // fin switch erreur
   }
   /* ---------------- Endpoint pour les requetes de types post ---------------- */
-  post(endpoint: string, body: any): Observable<any> {
+  post(endpoint: string, body?: any): Observable<any> {
     return this.http.post(endpoint, body, {
       headers: this.createAuthorizationHeader()
     }).pipe(

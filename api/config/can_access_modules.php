@@ -58,4 +58,11 @@ return array(
             md5(base64_encode(intval(env('identifiant_role_manager')))),
         ],
     ),
+    array(
+        'key' => "can_access_demande_demo",
+        'value' => [
+            md5(base64_encode(intval(env('identifiant_role_admin')))),
+            md5(base64_encode(intval(env('identifiant_role_manager')))),
+        ],
+    ),
 );

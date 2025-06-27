@@ -12,6 +12,7 @@ export const environment = {
   API_BASE_URL_FOURNISSEUR: `${api_url}/api_fournisseurs/`,
   API_BASE_URL_ARTICLES: `${api_url}/api_articles/`,
   API_BASE_URL_MARQUES: `${api_url}/api_marques/`,
+  API_BASE_URL_CONTACT: `${api_url}/api_contact/`,
   API_BASE_URL_STORAGE_PARTENAIRES: `${api_url}/storage/partenaires/`,
   /* --------------------------------- Claims --------------------------------- */
   unique_claim: 'Vnh0ohapK8pKusj7618QJKKjh4PTm0ploK',
@@ -51,6 +52,8 @@ export const environment = {
     contacts: {
       AfficherContactsAdmins: 'AfficherContactsAdmins',
       ModifierContacts: 'ModifierContacts',
+      afficherDemandesDemo: "afficherDemandesDemo",
+      marqueVuDemandesDemo: "marqueVuDemandesDemo"
     },
     contenus: {
       AfficherContenusAdmins: 'AfficherContenusAdmins',
@@ -121,7 +124,8 @@ export const environment = {
       ModifierMarque: "ModifierMarque",
       SupprimerMarque: "SupprimerMarque",
       ManageLogo: "ManageLogo"
-    }
+    },
+
   },
   /* -------------------------------------------------------------------------- */
   /*                                 LES LISTES                                 */

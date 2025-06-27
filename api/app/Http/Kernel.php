@@ -61,7 +61,7 @@ class Kernel extends HttpKernel
             'throttle:250,1', // limite à 250 requêtes par minutes au maximum
             'bindings'
         ],
-        'api_marques' => [
+        'api_contact' => [
             'throttle:250,1', // limite à 250 requêtes par minutes au maximum
             'bindings'
         ]
