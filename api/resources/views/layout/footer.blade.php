@@ -1,9 +1,9 @@
 <!-- Start Footer -->
 <footer id="footer" >
-    <div class="footer-newsletter" id="contact">
+    <div class="footer-newsletter pattern" id="contact">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-6">
+                <div class="col-lg-6 rounded-5" style="background: #F7FAFF; padding: 30px;">
                     <h4>REJOIGNEZ NOTRE BULLETIN D'INFORMATION</h4>
                     <p id="desc_newsleter">Abonnez-vous à notre newsletter pour recevoir en exclusivité des offres
                         spéciales</p>
