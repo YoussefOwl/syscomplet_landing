@@ -9,6 +9,7 @@
                 <div class="d-flex flex-column align-items-center">
                     <img src="{{ $item->image_marque }}" alt="{{ $item->description }}"
                         style="color: rgb(173, 173, 173) !important; height: 200px !important; width: 200px !important; object-fit: contain">
+                    <strong style="color: rgb(77, 77, 77)">{{ $item->libelle_marque }}</strong>
                 </div>
             </div>
         @endforeach

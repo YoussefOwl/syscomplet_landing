@@ -8,8 +8,8 @@
                     <p id="desc_newsleter">Abonnez-vous à notre newsletter pour recevoir en exclusivité des offres
                         spéciales</p>
                     <form id="newsletter_from">
-                        <input type="email" name="email" id="email-news" style="outline: unset !important;"><input
-                            id="send-news" type="submit" value="S'abonner">
+                        <input type="email" name="email" id="email-news" style="outline: unset !important;">
+                        <input id="send-news" type="submit" value="S'abonner" class="rounded-5">
                     </form>
                     <div class="my-3" id="newsletter_msg">
                         <div class="error-message" id="error-message-news"></div>
@@ -53,16 +53,10 @@
                     <h4>LIENS UTILES</h4>
                     <ul>
                         <li><i class="bx bx-chevron-right"></i> 
-                            <a 
-                                href="https://wa.me/{!! preg_replace('/<[^>]*>/', '',$footer->where('html_id', 'footer_phone')->value('description_fr')) !!}?text={{ urlencode('Bonjour, je souhaite en savoir plus sur vos services.') }}" 
-                                target="_blank">CONTACTEZ-NOUS
+                            <a href="mailto:{!! preg_replace('/<[^>]*>/', '', $footer->where('html_id', 'footer_mail')->value('description_fr')) !!}">CONTACTEZ-NOUS
                             </a>
                         </li>
                         <li><i class="bx bx-chevron-right"></i> <a href="#services">NOS SERVICES</a></li>
-                        <li><i class="bx bx-chevron-right"></i> <a href="{{route('about-us')}}">À PROPOS DE NOUS</a></li>
-                        <li><i class="bx bx-chevron-right"></i> <a href="{{route('politiques')}}">POLITIQUE DE
-                                CONFIDENTIALITÉ</a></li>
-                        <li><i class="bx bx-chevron-right"></i> <a href="{{route('termes')}}">TERMES ET CONDITIONS</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 col-md-6 footer-links">

@@ -114,10 +114,6 @@ class PagesController extends Controller
         }
     }
 
-    public function demandeDemoStore(Request $request) {
-        dd($request->all());
-    }   
-
     private function contenusPage($page)
     {
         return contenus::where('page', $page)

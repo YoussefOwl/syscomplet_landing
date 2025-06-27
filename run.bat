@@ -10,5 +10,6 @@ cd ./bo
 start ng s
 
 "C:\Program Files\Google\Chrome\Application\chrome.exe" "http://localhost:4200/accueil"
+"C:\Program Files\Google\Chrome\Application\chrome.exe" "http://localhost:8000"
 cd ..
 cls
