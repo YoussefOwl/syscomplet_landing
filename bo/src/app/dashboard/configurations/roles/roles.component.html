@@ -1,7 +1,7 @@
 <app-loader *ngIf="is_loading"></app-loader>
 <div class="d-flex justify-content-center center_media mb-2">
     <div>
-        <img src="./assets/images/roles.svg" class='worker' alt="image verify">
+        <img src="assets/images/roles.svg" class='worker' alt="image verify">
     </div>
 </div>
 <!-- -------------------- Le formulaire de la recherche --------------------- -->
@@ -213,7 +213,7 @@
             <td [attr.colspan]="7">
                 <div class="text-center">
                     <div class="center_media">
-                        <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                        <img src="assets/images/no_data.png" width="90px" alt="image no_data">
                     </div>
                     <p *ngIf="!is_loading" class="font-weight-bold mt-2">
                         Aucun enregistrement sur la base de données
@@ -236,7 +236,7 @@
                     <button type="button" class="btn btn-red" (click)="if_show_dialog=false">Fermer</button>
                 </div>
                 <div>
-                    <img src="./assets/images/roles.svg" width="130px" alt="roles image">
+                    <img src="assets/images/roles.svg" width="130px" alt="roles image">
                 </div>
                 <div class="mt-auto">
                     <button type="submit" class="btn btn-vert" [disabled]="Disabled || is_loading">

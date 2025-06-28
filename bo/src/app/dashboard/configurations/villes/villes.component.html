@@ -108,7 +108,7 @@
                 <td [attr.colspan]="4">
                     <div class="text-center">
                         <div class="center_media">
-                            <img src="./assets/images/no_data.png" width="90px" alt="image no_data">
+                            <img src="assets/images/no_data.png" width="90px" alt="image no_data">
                         </div>
                         <p *ngIf="!is_loading" class="font-weight-bold mt-2">
                             Aucun enregistrement sur la base de données
@@ -128,7 +128,7 @@
     <p-fieldset legend="Formulaire :" *ngIf="if_show_dialog">
         <div class="d-flex justify-content-center center_media mb-2">
             <div>
-                <img src="./assets/images/ville.svg" width="130px" alt="image ville">
+                <img src="assets/images/ville.svg" width="130px" alt="image ville">
             </div>
         </div>
         <form [formGroup]="Formmulaire" (ngSubmit)="AjouterModifierVille()">

@@ -1,7 +1,7 @@
 <app-loader *ngIf="is_loading"></app-loader>
 <section>
   <div class="imgBx">
-    <img src="/assets/images/login.svg" alt="Image du login">
+    <img src="assets/images/login.svg" alt="Image du login">
   </div>
   <div class="contentBx">
     <div class="formBx">
@@ -10,7 +10,7 @@
           <span id="titre">Authentification</span>
         </div>
         <div class="d-flex justify-content-center" style="align-items: center;">
-          <img src="/assets/images/id.gif" class="login_image_css" alt="image user">
+          <img src="assets/images/id.gif" class="login_image_css" alt="image user">
         </div>
         <form [formGroup]="FormulaireLogin" (ngSubmit)="LoginUtilisateur()">
           <div class="inputBx" [ngClass]="{'error': IsFiled && FormulaireLogin.get('email').errors}">
@@ -33,7 +33,7 @@
             </button>
           </div>
           <div class="d-flex justify-content-center mt-4" style="align-items: center;">
-            <img src="/assets/images/logo.svg" width="150" alt="Logo">
+            <img src="assets/images/logo.svg" width="150" alt="Logo">
           </div>
         </form>
       </p-card>

@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   localStorage.setItem("current_lang", "fr");
   PartenairesCarousel();
-  AfficherContactsSubjects();
   $("#contact-from").submit(function (event) {
     event.preventDefault();
   });
@@ -183,30 +182,7 @@ function AjouterNewsletters() {
     },
   });
 }
-/* ------------------------- Récupération du contenu ------------------------ */
-function AfficherContactsSubjects() {
-  $.ajax({
-    url: API_URLS.API_BASE_URL + "AfficherContactsSubjects", // Replace with your API URL
-    type: "GET", // Method type (GET, POST, etc.)
-    dataType: "json", // Type of data expected to receive
-    success: function (response) {
-      if (response?.api_message != "success") {
-        return;
-      }
-      $.each(response.Data, function (index, item) {
-        // 'item' is the current element in the array
-        var _itemElement = $(
-          `<option value="${item.value}">${item.label}</option>`
-        );
-        $("#sujet_contact").append(_itemElement);
-      });
-    },
-    error: function (xhr, status, error) {
-      // Handle error
-      console.error("Error:", error);
-    },
-  });
-}
+
 /* ------------------------- Récupération du contenu ------------------------ */
 function AjouterContact() {
   if (

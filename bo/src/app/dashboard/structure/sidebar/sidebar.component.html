@@ -3,15 +3,15 @@
     <div class="mb-2 d-flex justify-content-center">
       <!-- -------------------------- Image de profile --------------------------- -->
       <div class="user-picture m-auto" *ngIf="image_user">
-        <img src="./assets/images/my-loader.svg" class="img-fluid" alt="image user"
+        <img src="assets/images/my-loader.svg" class="img-fluid" alt="image user"
           *ngIf="is_loading && is_loading_image">
         <img [src]="image_user" class="img-fluid" alt="image user" *ngIf="!is_loading || !is_loading_image"
           onerror="this.src='assets/images/no_image.png'">
       </div>
       <div class="user-picture m-auto" *ngIf="!image_user" style="border-radius: unset !important;">
-        <img src="./assets/images/my-loader.svg" class="img-fluid" alt="image user"
+        <img src="assets/images/my-loader.svg" class="img-fluid" alt="image user"
           *ngIf="is_loading && is_loading_image">
-        <img src="./assets/images/user.png" class="img-fluid" alt="image user" tooltipPosition="right"
+        <img src="assets/images/user.png" class="img-fluid" alt="image user" tooltipPosition="right"
           *ngIf="!is_loading || !is_loading_image" pTooltip="{{user_data?.nom +' '+user_data?.prenom}}">
       </div>
     </div>
@@ -53,12 +53,12 @@
           class="fa fa-power-off mr-2" style="color: #ff0000 !important;" aria-hidden="true"> </i>
       </li>
       <li *ngIf="generalService.innerWidth<992">
-        <img src="./assets/images/logo.svg" alt="logo of application" width="70">
+        <img src="assets/images/logo.svg" alt="logo of application" width="70">
       </li>
     </ul>
     <div class="text-center mt-4 sidebar-search-no" *ngIf="menu_sidebar.length==0">
       <div class="center_media">
-        <img src="./assets/images/no_data.png" width="80px" alt="image no_data">
+        <img src="assets/images/no_data.png" width="80px" alt="image no_data">
       </div>
       <p class="font-weight-bold mt-2 font_12">
         Aucun résultat
@@ -67,9 +67,9 @@
   </nav>
   <div class="navbar-header text-center p-2" tooltipPosition="top" style="cursor: pointer;"
     (click)="Gotomenu({'routerLink': '/accueil'}, true)" pTooltip="Accueil">
-    <img src="./assets/images/logo.svg" alt="logo" width="150" *ngIf="generalService?.menu_toggel">
+    <img src="assets/images/logo.svg" alt="logo" width="150" *ngIf="generalService?.menu_toggel">
     <!-- -------------------------------- mini --------------------------------- -->
-    <img src="./assets/images/logo.svg" style="padding-top: 5px;" alt="logo" width="150"
+    <img src="assets/images/logo.svg" style="padding-top: 5px;" alt="logo" width="150"
       *ngIf="!generalService?.menu_toggel">
   </div>
 </aside>
