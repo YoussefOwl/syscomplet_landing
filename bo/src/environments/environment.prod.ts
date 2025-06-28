@@ -1,5 +1,5 @@
-const front_url: any = "https://bo.syscomplet.com";
-const api_url: any = "https://api.syscomplet.com";
+const front_url: any = "https://syscomplet.com/bo/";
+const api_url: any = "https://syscomplet.com";
 export const environment = {
     production: false,
     FRONT_URL: `${front_url}`,

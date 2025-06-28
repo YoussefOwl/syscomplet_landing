@@ -39,4 +39,14 @@
             @endforeach
         </div>
     @endif
+    <div class="section-title mt-4 rounded-b-5 p-3 bg-white">
+        <h2 class="fw-bold">DÉVELOPPEMENT SPÉCIFIQUE</h2>
+        <div class="scroll-fide tw-box rounded-2 d-flex justify-content-end align-items-center">
+            <div class="p-4 bg-white rounded-start-5 rounded-top-5 shadow-lg col-lg-6 col-md-12 col-sm-12">
+                <b>
+                    {!!$contenusPage->where('html_id',"desc_block_developpement_specifique")->value('description_fr')!!}
+                </b>
+            </div>
+        </div>
+    </div>
 </section>

@@ -63,9 +63,11 @@ class PagesController extends Controller
     {
         try {
             $liste_articles = $this->articlesPage();
+            $contenusPage = $this->contenusPage("articles");
             $footer         = $this->headerFooter(["footer"]);
             return view('body.articles_grid', [
                 'articles' => $liste_articles,
+                "contenusPage" => $contenusPage,
                 'footer'   => $footer,
             ]);
         } catch (Exception | QueryException $error) {

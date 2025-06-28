@@ -23,6 +23,7 @@ return [
     ],
     "liste_pages" => [
         ['value' => 'landing_page', 'label' => "Page d'accueil"],
+        ['value' => 'articles', 'label' => "Articles"],
         ['value' => 'about', 'label' => 'À propos'],
         ['value' => 'contact', 'label' => 'Contact'],
         ['value' => 'faq', 'label' => 'FAQ'],
