@@ -1,4 +1,4 @@
-const front_url: any = "https://syscomplet.com/bo/";
+const front_url: any = "https://syscomplet.com/bo";
 const api_url: any = "https://syscomplet.com";
 export const environment = {
   production: false,
