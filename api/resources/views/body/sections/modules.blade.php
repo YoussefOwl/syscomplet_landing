@@ -12,7 +12,7 @@
             @foreach ($articles as $index=>$item)
                 @if(($index+1) % 2 != 0)
                     <div class="scroll-fide tw-box rounded-2 d-flex align-items-center" style="height: 100%;">
-                        <div class="p-4 bg-white rounded-end-5 rounded-top-5 shadow-sm">
+                        <div class="p-4 bg-white rounded-end-5 rounded-top-5 shadow-sm" style="text-align: justify !important; line-height: 2 !important; color: #4c4c4c !important;">
                             <h2 class="mb-2" style="color: #5894fb; text-align: unset !important;">{{$item->libelle_article}}</h2>
                             <div>
                                 <b>
@@ -30,7 +30,7 @@
                 </div>
                 @if(($index+1) % 2 == 0)
                     <div class="scroll-fide tw-box rounded-2 d-flex align-items-center" style="height: 100%;">
-                        <div class="p-4 bg-white rounded-start-5 rounded-top-5 shadow-sm">
+                        <div class="p-4 bg-white rounded-start-5 rounded-top-5 shadow-sm" style="text-align: justify !important; line-height: 2 !important; color: #4c4c4c !important;">
                             <h2 class="mb-2" style="color: #5894fb; text-align: unset !important;">{{$item->libelle_article}}</h2>
                             <div>
                                 <b>
