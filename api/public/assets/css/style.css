@@ -1,3 +1,6 @@
+html {
+  scroll-behavior: smooth !important;
+}
 @font-face {
   font-family: "CeraRoundPro";
   src: url("TypeMatesCeraRoundProRegular.otf") format("opentype");

@@ -12,6 +12,7 @@
                 <b class="text-white">Voir tous les modules</b>
             </a>
         </div>
+        @include('body.sections.avantages')
         @include('body.sections.materierls')
     </main>
 @endsection
