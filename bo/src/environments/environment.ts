@@ -1,5 +1,5 @@
 const front_url: any = 'http://localhost:4200';
-const api_url: any = 'https://syscomplet.com';
+const api_url: any = 'https://localhost:8000';
 export const environment = {
   production: false,
   FRONT_URL: `${front_url}`,

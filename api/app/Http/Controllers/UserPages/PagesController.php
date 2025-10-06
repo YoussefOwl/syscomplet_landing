@@ -7,6 +7,7 @@ use App\Models\configurations\contenus;
 use App\Models\Fournisseurs\fournisseurs;
 use App\Models\Marques\marques;
 use App\Models\partenaires\partenaires;
+use App\Traits\Globlal\ErrorHandling;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use PHPUnit\Exception;
 
 class PagesController extends Controller
 {
+    use ErrorHandling;
     public function landingPage()
     {
         try {
